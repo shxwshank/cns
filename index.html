@@ -71,6 +71,22 @@ canvas{display:block;width:100%;height:100%;image-rendering:auto;touch-action:no
 .dots{display:flex;gap:4px}
 .dots i{width:18px;height:4px;background:rgba(143,200,236,.2);border-radius:2px}
 .dots i.on{background:var(--cyan)}
+.chat{display:grid;gap:12px}
+.line{display:flex;gap:10px;align-items:flex-start;max-width:100%}
+.line.me{flex-direction:row-reverse}
+.ava.sm{width:38px;height:38px;font-size:15px;margin-top:18px}
+.line.me .ava.sm{color:#0B0F1C;font-family:var(--mono);font-size:10px;font-weight:600}
+.bw{display:grid;gap:3px;min-width:0;max-width:min(620px,86%)}
+.line.me .bw{justify-items:end}
+.nm{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.bub{padding:11px 14px;font-size:15.5px;line-height:1.5;display:grid;gap:9px;border:1px solid var(--rule-strong);background:var(--panel-2);border-radius:4px 14px 14px 14px}
+.line.me .bub{background:#EDF1F7;color:#10172A;border-color:#EDF1F7;border-radius:14px 4px 14px 14px;font-weight:500}
+.bub b{color:var(--brass);font-weight:600}
+.bub ul,.bub ol{margin:0;padding-left:20px;display:grid;gap:5px}
+.bub .said{display:block}
+.bub .tic{font-style:italic;color:var(--cyan)}
+.bub.tip{border-color:var(--cyan);background:rgba(143,200,236,.08)}
+.bub.soft{font-style:italic}
 .q-text{font-size:clamp(17px,2.4vw,20px);font-weight:600;line-height:1.38}
 .opts{display:grid;gap:8px}
 .opt{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;text-align:left;background:var(--panel-2);border:1.5px solid var(--rule);border-radius:4px;padding:10px 12px;font-size:15.5px}
@@ -128,7 +144,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:auto;touch-action:no
 <div class="ov" id="ov" hidden><div class="card" id="ovc" role="dialog" aria-modal="true"></div></div>
 
 <script>
-/* Content: Grant (IIMB adaptation) Ch 1,2,3,4,8; Porter 1996, 2008; Collis & Montgomery.
+/* Content: Grant (IIMB adaptation) Ch 1,2,3,4,8; Porter 1996, 2008; Collis & Montgomery; past C&S quizzes.
    MCQ format: [question, [correct, wrong, wrong, wrong], explanation] */
 const CREW = [
 { id:"m", ini:"MM", crew:"The Mastermind", src:"Ch 1 · Porter, What Is Strategy?", role:"Writes the plan and decides what the crew will not do.",
@@ -397,28 +413,111 @@ const CREW = [
   ]}
 ];
 
+
+/* =================================================================
+   PAST-PAPER BANK: questions adapted from C&S Quiz 1 (2020, 2021, 2023, 2024),
+   limited to what's on this year's syllabus. Format: [q, [correct, wrong x3], explanation, source]
+   ================================================================= */
+const PAST = {
+m:[
+ ["In a highly competitive industry, which practice is most likely to lead to inferior performance?",["Trying to be everything to everybody by combining different competitive strategies","Focusing on creating value for customers rather than destroying rivals","Choosing a distinct strategic position in the industry","Widening the gap between value created and cost"],"Porter: straddling several positions creates trade-off penalties, as Continental Lite found.","2020"],
+ ["Which statement about strategy is NOT true?",["Operational effectiveness and competitive benchmarking should be treated as strategy","Grandiose statements of desire, on their own, are not strategy","Strategy is as much about deciding what not to do as what to do","Strategy is about creating superior value while containing the cost of creating it"],"OE is necessary but not sufficient. Benchmarking leads to competitive convergence.","2020"],
+ ["What is the strongest reason a company cannot be 'all things to all people'?",["There are trade-offs involved in serving every need","People have differentiated choices","Companies cannot improve productivity infinitely","Vision, mission and goals must be sharply defined"],"Trade-offs make activities incompatible: more of one thing means less of another.","2024"],
+ ["In 'What Is Strategy?', companies may not see a trade-off between improving quality and reducing cost when they are:",["Far from the productivity frontier","At the productivity frontier","Ahead of competitors in operational effectiveness","In a fast-growing industry"],"Simultaneous gains are possible only when a firm starts far behind the frontier. At the frontier the trade-off is real.","2024"],
+ ["In 'What Is Strategy?', which statement is TRUE?",["Variety-, needs- and access-based positioning can each be pursued through either a cost or a differentiation strategy","Variety-based positioning works only with differentiation","Needs-based positioning works only with a cost strategy","Access-based positioning works only with a cost strategy"],"IKEA is needs-based and cost-focused, Southwest variety-based and cost-focused, Neutrogena a focused differentiator.","2024"],
+ ["In 'What Is Strategy?', strategic fit refers to:",["Consistency among a firm's activities, reinforcing each other toward the chosen position","The firm's alignment with its external environment alone","Matching competitors' best practices","Agreement between the vision and mission statements"],"Porter's fit is among activities: first-order consistency, second-order reinforcement, third-order optimization of effort. Grant's broader 'strategic fit' also includes the environment.","2024"],
+ ["When change opens new positions in an industry, Porter says new entrants often take them before incumbents because:",["Incumbents face trade-offs with their existing activities and may overlook the new position","Incumbents always face high exit barriers","Entrants always have more capital","Regulators favour new entrants"],"Newcomers are unencumbered by history and face no trade-offs with existing activities.","2024"],
+ ["Which statement best describes strategy?",["A set of goal-directed actions a firm takes to gain and sustain superior performance","Launching a celebrity marketing campaign for new products","Operational effectiveness and production efficiency","Switching to home delivery just during a lockdown"],"Campaigns and temporary moves are tactics; OE is not strategy.","2021"],
+ ["Which is a drawback of SWOT analysis?",["A strength can also be a weakness, and an opportunity can simultaneously be a threat","It considers only the internal environment","It applies only to manufacturing firms","It evaluates only the present, never the future"],"This is exactly why Grant prefers a two-way internal/external split.","2020"],
+ ["Which is NOT true about competitive advantage?",["It can be assessed in regulator-protected markets such as monopolies","A firm can have it by offering similar value at lower cost","Firms that consistently outperform rivals have it","It can be lost when industry dynamics change"],"Competitive advantage means outperforming rivals. A protected monopoly has no rivals to measure against.","2021"]
+],
+b:[
+ ["Total value created equals:",["Both 'willingness to pay minus producers' willingness to sell' and 'producer surplus plus consumer surplus'","Selling price minus costs","Consumer surplus only","Profit plus taxes"],"Value created = customer value minus real cost, shared as consumer and producer surplus.","2024"],
+ ["In an industry where price is the ONLY basis of competition:",["Any new value created will be appropriated by customers","No new value can be created","New value from productivity gains is kept by the companies","Any new value created is appropriated by suppliers"],"Pure price competition transfers profits directly from the industry to its customers.","2024"],
+ ["Which is true of the stakeholder approach to strategy?",["Firms should try to understand relationships among stakeholders even though they are complex","Shareholder value should come first in high-growth industries","Firms selling to distant markets can worry less about local communities","Employees are just one stakeholder, so strikes matter little"],"Grant: stakeholder interests often converge over the long run, and legitimacy with communities and employees matters.","2020"]
+],
+s:[
+ ["Which makes buyers more price sensitive?",["The product is a significant portion of the buyer's budget","The buyer group is small and exclusive","The product's quality is important to the buyer","Product reliability matters a lot to the buyer"],"When quality or reliability matters, buyers care less about price.","2024"],
+ ["To judge how complements affect industry profitability, Porter says consider:",["Their influence on all five forces","Their influence on substitutes only","The demand for the complements","The advantage of complementors"],"Complements are not a sixth force; trace their effect through each of the five.","2024"],
+ ["Substitute products limit an industry's profit potential by:",["Placing a ceiling on prices","Enhancing product variety","Taking complements out of the equation","Creating competition on material costs"],"If prices rise, buyers switch to the substitute.","2024"],
+ ["Shifts in industry structure are likely to:",["Either raise or lower industry profitability","Always raise profitability","Always lower profitability","Leave profitability unchanged"],"Structural change can move the forces in either direction.","2024"],
+ ["Which is NOT true?",["Entry barriers that stop start-ups are equally effective against established firms diversifying from other industries","An exit barrier is anything that keeps excess capacity from leaving an industry","Washing machines and fridges can be one industry if there is supply-side substitutability","Threats of incumbent retaliation reduce the threat of entry"],"Barriers are relative to the entrant: Google vaulted barriers that stop start-ups.","2024"],
+ ["Barriers to entry are high when:",["Minimum efficient scale is large relative to total industry demand","Minimum efficient scale is small relative to demand","Economies of scale are low","Many firms already compete"],"An entrant must come in big (flooding the market) or accept a cost disadvantage.","2024"],
+ ["Which is NOT a barrier to entry?",["Slow industry growth","Supply-side economies of scale","Capital requirements","Restrictive government policy"],"Slow growth intensifies rivalry; it is not an entry barrier.","2024"],
+ ["Economies of scale act as an entry barrier because:",["Entrants face high unit costs, entering at sub-optimal scale or with a large, underused plant","Entrants start at the top of the learning curve","Entrants are uncertain about future costs","Incumbents can always flood the market"],"Grant: enter at minimum efficient scale with excess capacity, or accept a cost disadvantage.","2024"],
+ ["An industry has many competitors, high exit costs, slow growth, undifferentiated products and little customer loyalty. Rivalry will most likely be:",["Intense","Constrained","Low","Impossible to judge"],"Every listed factor intensifies rivalry.","2021"],
+ ["Buyers have high bargaining power when:",["A few large buyers account for most of the industry's sales","Many buyers each account for a small share of sales","Buyers have limited alternatives","Buyers are located overseas"],"Buyer concentration and volume create leverage.","2021"],
+ ["High capital requirements, heavy incumbent branding, unique technology and large investments in distribution most likely mean:",["A low threat of new entrants","A high threat of new entrants","Low barriers to entry","High supplier power"],"Each is a barrier to entry.","2021"],
+ ["Low-growth or declining markets are usually associated with:",["Price competition and low profitability","Higher prices and industry profits","Many new entrants","Lower rivalry"],"Slow growth makes firms fight for share.","2021"],
+ ["Taylor Swift getting Apple Music to pay artist royalties is an example of:",["Supplier bargaining power","Intensity of rivalry","Threat of new entrants","Threat of substitutes"],"Artists supply the content that streaming services sell.","2021"],
+ ["All else equal, which lowers barriers to entry?",["Inputs are widely available at competitive prices","Products are highly differentiated","The industry's technology keeps shifting","There is a first-mover advantage"],"No incumbent advantage in access to inputs.","2021"],
+ ["Industry rivalry is highest when:",["Excess capacity exists in the industry","The industry is a duopoly","Incumbents operate in many other industries","The industry is growing fast"],"Unused capacity pushes firms to cut prices.","2021"],
+ ["Which is FALSE about the limitations of the five forces?",["It cannot explain the high bargaining power of suppliers such as coal suppliers to steel plants","It assumes stable industries and boundaries","It takes a snapshot and ignores dynamics over time","It assumes firms offer similar products in defined industries"],"Supplier power is one of the five forces, so it explains this directly.","2021"],
+ ["Which is true about Porter's five forces?",["The framework remains valid even when one force lowers profitability and another raises it","Individual forces need not be analysed separately","Analysing a single force is usually enough","It applies only where rivalry is high"],"Forces rarely move in the same direction; combining them is a matter of judgment.","2020"],
+ ["Which is NOT a step in industry analysis?",["Declaring the industry attractive or unattractive","Defining the relevant industry","Identifying the players in each force","Identifying the drivers of each force"],"Porter warns against using the framework to label industries rather than guide choices.","2020"],
+ ["After a new retailer enters, two incumbents cut prices and spend more improving their radios. They have:",["Decreased industry profit potential","Increased exit barriers","Decreased exit barriers","Increased industry profit potential"],"Retaliation through price and spending transfers value away from the industry.","2020"],
+ ["Smartphones now serve needs once met by music players, game devices and magazines. This is best known as:",["Industry convergence","Product differentiation","Backward integration","Customer myopia"],"Industry boundaries shift as products from different industries converge.","2020"],
+ ["Which statement about industry structure is true?",["A consolidated industry tends to be more profitable than a fragmented one","More competitors generally means higher profitability","Industry structures are stable, not dynamic","A few large competitors raise supplier and buyer power"],"Concentration usually mutes price competition.","2020"],
+ ["Which is FALSE about the threat of substitutes and switching costs?",["Banks bundling savings and demat accounts decrease customers' switching costs","Customers may switch to a better robotic roti maker even at a higher price","Mobile number portability can cut telecom profits by lowering switching costs","Travel-aggregator users switch airlines more readily than direct bookers"],"Bundling raises switching costs.","2020"],
+ ["Which is FALSE about complements?",["Complements decrease customers' switching costs","They may be offered by the same firm or others","They add value when used together","They increase demand for the primary product"],"Complements tend to raise switching costs (think printer and ink).","2020"],
+ ["Nutella holds 54% of chocolate spreads though variations are easy to make at home. What best explains its share?",["It is difficult for entrants to scale up operations and bring costs down quickly","Almond and walnut spreads have also been launched","Its Canadian plant resumed after strikes","The spread is easy to make at home"],"Scale economies and brand act as entry barriers.","2020"],
+ ["Electricity is a commodity, but huge set-up costs have kept entrants out. Which factor REDUCES utility profitability?",["Very little differentiation, making electricity a commodity","The difficulty for entrants of investing and scaling up","Large fuel contracts that curb supplier power","Regulations protecting incumbents"],"Commodity products push competition toward price. The other three protect incumbents.","2020"],
+ ["Which statement about environmental (PESTEL) factors is FALSE?",["A single IT firm can materially change the country's unemployment rate by hiring more","Ride-sharing firms may see ICT changes as threats or opportunities","Pharma firms can shape political factors through lobbying","Beverage firms may add low-calorie options due to sociocultural shifts"],"Individual firms rarely move macroeconomic variables.","2020"],
+ ["Newspapers' ad revenues fell about 80% as the internet took off. This erosion of profit is an example of:",["Industry structure change","Hypercompetition","Knowledge intensity","Global markets"],"New substitutes and powerful platforms reshaped the forces.","2021"],
+ ["The prevalence of only a few music streaming companies is best explained by:",["Demand-side benefits of scale","Supply-side benefits of scale","Heavy industry regulation","Threat of deterrence"],"Network effects make users and artists gravitate to the biggest platforms.","2024"],
+ ["ASML holds 62% of photolithography equipment and alone has mastered EUV. This industry is characterised by:",["Low intra-industry rivalry","Low barriers to entry","High buyer power","Locational advantage"],"Few rivals and a unique technology mute rivalry.","2021"],
+ ["___ relates unit cost to the volume produced at a point in time; ___ relates unit cost to cumulative production.",["Economies of scale; experience curve","Experience curve; economies of scale","Economies of scale; competitive advantage","Competitive advantage; economies of scale"],"Both are cost-based sources of incumbent advantage.","2024"]
+],
+i:[
+ ["If industry explains about 20% of profit variation and firm strategy about 55%, what can we conclude?",["Industry and firm analysis are both useful, though together they don't explain everything","Industry analysis is not useful","Firms can improve profit only by switching industries","Profit differences within an industry are always temporary"],"Grant: industry factors explain a small share, but industry analysis still matters for threats and positioning.","2020"],
+ ["Lego earns 25% margins while rival Mattel earns under 20%. What can we conclude?",["Margins can vary considerably between firms in the same industry","Online retail is more profitable","A Barbie is easier to copy than a Lego brick","The five forces are weaker for Lego"],"The five forces apply to the whole industry; firm differences come from competitive advantage.","2020"],
+ ["Relative to firm-level factors, industry factors account for a ___ share of interfirm profit differences.",["Smaller","Larger","Equal","Undeterminable"],"Differences within industries are larger than those between them.","2024"]
+],
+q:[
+ ["Collis and Montgomery say a common mistake is investing in core competencies without:",["Conducting an industry analysis","Determining how imitable they are","Having a dominant design","Having a strong substitute"],"Masco's metalworking competence earned low returns in structurally poor industries.","2024"],
+ ["For Spotify, the content library and content production are, respectively, a:",["Resource; capability","Capability; resource","Strength; opportunity","Competence; trade-off"],"The library is owned; producing content is what the firm can do.","2021"],
+ ["For an airline, superior customer service and premium routes are, respectively, a:",["Capability; resource","Resource; capability","Opportunity; threat","Competence; complement"],"Service is something the firm does; routes (slots) are owned.","2021"],
+ ["Which is NOT a resource for an organization?",["Industry rivals","Assets and capabilities","Firm knowledge","Organizational processes"],"Rivals are part of the external environment.","2021"],
+ ["ASML alone has harnessed extreme ultraviolet light for chipmaking equipment. This ability is a ___ resource.",["Valuable, rare and inimitable","Rare but not valuable","Valuable but easy to imitate","Common but valuable"],"It passes the demand, scarcity and inimitability tests.","2021"],
+ ["ASML's competitive advantage is most likely to erode if:",["Rivals develop the ability to handle shorter wavelengths than ASML","A major buyer integrates backward","Barriers to entry fall","Rivals merge with each other"],"A superior rival resource defeats competitive superiority.","2021"],
+ ["A pharma incumbent's product patent is an example of a ___ resource.",["Inimitable","Substitutable","Freely tradable","Fast-depreciating"],"Patents are physically unique in Collis and Montgomery's terms.","2021"],
+ ["The level of analysis for the five forces and the resource-based view is, respectively:",["Industry; firm","Firm; industry","Industry; industry","Firm; firm"],"RBV looks inside the firm, the five forces at the industry.","2021"],
+ ["Resource heterogeneity means that bundles of resources, capabilities and competencies:",["Differ across firms","Are the same across firms","Are mostly the same across firms","Differ only temporarily"],"No two firms have the same history, so resources differ.","2020"],
+ ["Under VRIO, a firm gains competitive advantage from resources that are ___ and captured by an organized firm.",["Valuable, rare, costly to imitate","Valuable, refined, costly to introduce","Varied, rare, costly to imitate","Varied, refined, costly to introduce"],"Barney's VRIO parallels Collis and Montgomery's tests.","2020"],
+ ["Google's AI edge comes from years of accumulated user data. Which best explains why it is hard to imitate?",["Path dependency","Deep pockets","Causal ambiguity","Economic deterrence"],"Built over time and hard to accelerate.","2023"]
+],
+t:[
+ ["The duration of an industry's life cycle:",["Has become compressed as technological change has accelerated","Typically extends over a century","Is determined by the longevity of the firms in it","Is fixed across countries"],"Grant: life cycles are shortening, especially online.","2024"],
+ ["Moving from growth toward decline in the life cycle is characterised by:",["Increased price wars","Increasing product differentiation","Process innovation giving way to product innovation","Rising economies of scale"],"Commoditization and excess capacity push price competition.","2024"],
+ ["Early-mover advantage is characterised by:",["Building an exclusive network of suppliers and complementors","An absolute cost advantage","Attracting laggard consumers","High exit barriers for incumbents"],"Early movers can pre-empt scarce partners.","2021/2024"],
+ ["After deregulation, BSNL struggled against new telecom entrants. Its main source of disadvantage was:",["Sunk investment in old circuit-switching technology","Competition from private players","Deregulation itself","Low demand for data"],"Legacy assets and routines are a source of inertia: entrants started with the newer technology.","2021"]
+]
+};
+CREW.forEach(c=>{ c.past = (PAST[c.id]||[]); });
+
+
 /* =================================================================
    GAME DATA ADDITIONS
    ================================================================= */
 const ORDER = ["s","m","i","b","q","t"];      /* heist route */
 const PER_ROOM = 4, QTIME = 60, MAX_HEAT = 5;
 const EXTRA = {
- m:{ lvl:"Rooftop tryout", term:"Signal box", theme:"roof", haz:["pit","spikes","pit2","moving"], col:"#E8B04F", hat:"#1F2B45", coat:"#3B4A6B",
+ m:{ lvl:"Rooftop tryout", term:"Signal box", theme:"roof", haz:["pit","stairs","pit3","spring","moving","spikes2","elevator","pit2"], col:"#E8B04F", hat:"#1F2B45", coat:"#3B4A6B",
      prize:"Blueprint", pic:"BP", perk:"Forgives two wrong answers in the heist.",
-     ask:["Boss, why do some people win big? Is it talent or money?","How do you picture a strategy? What does it connect?","What's the difference between strategy and tactics? And 'where' versus 'how'?","Why bother with a strategy? We could just react as we go.","Do plans ever go the way they're written?","We're already faster and cheaper than everyone. Isn't that strategy?","So how do we pick a position that's really ours?","What stops someone copying our position?"] },
- b:{ lvl:"Safe-cracking test", term:"Safe", theme:"bank", haz:["spikes","moving","pit","spikes"], col:"#6FD39A", hat:"#3A2A18", coat:"#5A4630",
+     ask:["Why do some people win so big? Is it talent, or just money?","How should I picture a strategy? What does it actually connect?","What's the difference between strategy and tactics? And 'where' versus 'how'?","Why bother with a strategy? Can't I just react as I go?","Do plans ever go the way they're written?","If I'm faster and cheaper than everyone, isn't that a strategy?","How do I pick a position that's really mine?","What stops someone copying my position?"] },
+ b:{ lvl:"Safe-cracking test", term:"Safe", theme:"bank", haz:["spikes","moving","spring","stairs","spikes2","elevator","laser","guard"], col:"#6FD39A", hat:"#3A2A18", coat:"#5A4630",
      prize:"Stethoscope", pic:"ST", perk:"Three 50/50 tips on heist questions.",
-     ask:["Isn't value just the profit we make?","Whose value are we chasing, the owners' or everyone's?","Profit is profit. Why do you keep saying 'which profit'?","How do we put one number on what the whole firm is worth?","How do I tell whether a firm is doing well, and why?","How should I set targets for the crew?","Do values and CSR have anything to do with profit?","Why pay for small bets that might never pay off?"] },
- s:{ lvl:"Laser grid", term:"Laser console", theme:"lab", haz:["laser","laser","pit","laser"], col:"#F0604A", hat:"#101828", coat:"#2A3556",
+     ask:["Isn't value just the profit I make?","Whose value am I chasing, the owners' or everyone's?","Profit is profit, right? Why do you keep asking 'which profit'?","How do I put one number on what the whole firm is worth?","How do I tell whether a firm is doing well, and why?","How should I set targets for the crew?","Do values and CSR have anything to do with profit?","Why pay for small bets that might never pay off?"] },
+ s:{ lvl:"Laser grid", term:"Laser console", theme:"lab", haz:["laser","laserTrip","pit","laserFast","laserMove","spring","laser+camera","laserFast"], col:"#F0604A", hat:"#101828", coat:"#2A3556",
      prize:"Smoke canister", pic:"SM", perk:"Lasers stay on for a shorter time.",
-     ask:["Where do I even start when I case an industry?","What exactly are the five forces?","What keeps newcomers out of a juicy market?","When does competition between existing players get ugly?","How do I know who holds power, buyers or suppliers?","What about products that go together, like printers and ink?","OK, I've done the analysis. What do I do with it?","How do I decide where an industry's walls are? And what wins inside them?"] },
- i:{ lvl:"Guard shift", term:"Keycard reader", theme:"ware", haz:["guard","guard","pit","guard"], col:"#8FC8EC", hat:"#223018", coat:"#3E4F33",
+     ask:["Where do I even start when I case an industry?","What exactly are the five forces?","What keeps newcomers out of a juicy market?","When does competition between existing players get ugly?","How do I know who holds power, buyers or suppliers?","What about products that go together, like printers and ink?","OK, I've cased it. What do I do with the analysis?","How do I decide where an industry's walls are? And what wins inside them?"] },
+ i:{ lvl:"Guard shift", term:"Keycard reader", theme:"ware", haz:["guard","guard2","pit","guard+laser","stairs","laserTrip","spring","guard2"], col:"#8FC8EC", hat:"#223018", coat:"#3E4F33",
      prize:"Guard's jacket", pic:"GJ", perk:"Guard torch beams are half as long.",
-     ask:["If industry explains everything, why do firms in the same industry differ so much?","Who else is in the picture besides rivals, buyers and suppliers?","How much of the pie can we actually capture?","Why do rivals end up hurting each other on purpose?","How can we change how the guards play?","How do I predict what a rival will do next?","How do I split a market into pieces worth attacking?","Aren't firms with similar strategies basically one gang?"] },
- q:{ lvl:"Camera sweep", term:"Camera terminal", theme:"vault", haz:["camera","camera","spikes","camera"], col:"#C79BF2", hat:"#2A2540", coat:"#453C66",
+     ask:["If industry explains everything, why do firms in the same industry differ so much?","Who else is in the picture besides rivals, buyers and suppliers?","How much of the pie can I actually capture?","Why do rivals end up hurting each other on purpose?","How do I change how the guards play?","How do I predict what a rival will do next?","How do I split a market into pieces worth attacking?","Aren't firms with similar strategies basically one gang?"] },
+ q:{ lvl:"Camera sweep", term:"Camera terminal", theme:"vault", haz:["camera","cam2","spikes","camera+laser","elevator","camera+guard","cam2","spikes2"], col:"#C79BF2", hat:"#2A2540", coat:"#453C66",
      prize:"Grapple boots", pic:"GB", perk:"Double jump for the whole heist.",
-     ask:["What counts as a resource, and what makes one valuable?","How do I know if a resource can be copied?","Does a great resource last forever?","If we own the resource, don't we keep all the profit?","What if a rival beats our resource with a different one?","Everyone says they're good at marketing. How do I know we really are?","So what do we do with our resources?","Any terms the examiners like to trip people on?"] },
- t:{ lvl:"Collapsing tunnel", term:"Pressure switch", theme:"tunnel", haz:["crumble","moving","crumble","pit2"], col:"#F29A6B", hat:"#3A2014", coat:"#5E3A26",
+     ask:["What counts as a resource, and what makes one valuable?","How do I know if a resource can be copied?","Does a great resource last forever?","If I own the resource, don't I keep all the profit?","What if a rival beats my resource with a different one?","Everyone says they're good at marketing. How do I know I really am?","So what do I do with my resources?","Any terms the examiners like to trip people on?"] },
+ t:{ lvl:"Collapsing tunnel", term:"Pressure switch", theme:"tunnel", haz:["crumble","moving","crumbleSpikes","elevator","crumble+laser","pit3","crumbleLong","spring"], col:"#F29A6B", hat:"#3A2014", coat:"#5E3A26",
      prize:"Stopwatch", pic:"SW", perk:"+20 seconds per heist question, and floors crumble slower.",
      ask:["Do industries age like people?","How does an industry settle on one way of doing things?","What changes from stage to stage?","Who survives as the industry matures?","Why can't big firms just change when they need to?","Which kinds of new technology topple leaders?","How do leaders force change anyway?","How does a firm build capabilities it doesn't have?"] }
 };
@@ -441,7 +540,7 @@ try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(S, JSON.pa
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const byId = id => CREW.find(c=>c.id===id);
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function prep(item, tag){ const [q,opts,e]=item; return { q, e, tag, opts: shuffle(opts.map((t,i)=>({t,c:i===0}))) }; }
+function prep(item, tag){ const [q,opts,e,src]=item; return { q, e, tag, src, opts: shuffle(opts.map((t,i)=>({t,c:i===0}))) }; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function starsHtml(n){ return '<span class="stars" aria-label="'+n+' of 3 stars">'+[0,1,2].map(i=>'<i class="'+(i<n?'on':'')+'"></i>').join('')+'</span>'; }
 function starsFor(score,total){ const r=score/total; return r>=0.85?3:r>=0.6?2:r>=0.35?1:0; }
@@ -485,7 +584,7 @@ function themeAt(x){ if(!L) return TH.hub; for(const r of L.ranges) if(x>=r.x0*T
 
 function buildRun(spec){
   /* spec: [{id, qs:[Q...], label}] rooms in order. Returns level. */
-  const L2 = newLevel(40 + spec.reduce((a,r)=>a+r.qs.length*23+10, 0));
+  const L2 = newLevel(40 + spec.reduce((a,r)=>a+r.qs.length*30+10, 0));
   const g = L2.g; let x = 0;
   const col = (c, th, ceil)=>{ for(let y=FL;y<17;y++) g[y][c]="X"; if(ceil) g[0][c]="X"; };
   const theme = th => TH[th];
@@ -498,7 +597,7 @@ function buildRun(spec){
     const r0 = ri===0?0:x;
     if(spec.length>1){ flat(3); L2.ents.push({type:"sign", x:(x-2)*T, y:FL*T-110, text:byId(room.id).room, sub:"Room "+(ri+1)+" of "+spec.length}); flat(2); }
     room.qs.forEach((Q, qi)=>{
-      const hz = ex.haz[qi % ex.haz.length];
+      const hz = room.haz ? room.haz[qi] : ex.haz[qi % ex.haz.length];
       x += segment(L2, hz, x, curTh, qi);
       /* terminal zone */
       flat(6);
@@ -520,22 +619,45 @@ function buildRun(spec){
 
 function segment(L2, kind, x0, th, n){
   const g = L2.g, ce = TH[th].ceil, E = L2.ents;
+  const R = (lo,hi)=>lo+Math.floor(Math.random()*(hi-lo+1));
   const colF = (c)=>{ for(let y=FL;y<17;y++) g[y][c]="X"; if(ce) g[0][c]="X"; };
   const carve = (a,b)=>{ for(let c=a;c<=b;c++) for(let y=FL;y<17;y++) g[y][c]="."; };
+  const block = (c,h)=>{ for(let k=1;k<=h;k++) g[FL-k][c]="X"; };
   const coins = (cx, cy, k)=>{ for(let i=0;i<k;i++) E.push({type:"coin", x:(cx+i)*T+10, y:cy*T+8, w:12, h:14, got:false}); };
+  const laser = (c, opt={})=>E.push(Object.assign({type:"laser", x:c*T+16, y1:ce?T:0, y2:FL*T, per:2.4, on:.46, ph:Math.random()*2}, opt));
+  const trip = (c, opt={})=>E.push(Object.assign({type:"laser", trip:true, x:c*T+16, y1:FL*T-34, y2:FL*T, per:1, on:1, ph:0}, opt));
+  const guard = (a,b,opt={})=>E.push(Object.assign({type:"guard", x:b*T, y:FL*T-40, w:22, h:40, a:a*T, b:b*T, dir:-1, sp:R(50,70), wait:0}, opt));
+  const cam = (c,opt={})=>E.push(Object.assign({type:"cam", x:c*T+16, y:(ce?T:0)+10, mid:Math.PI/2, amp:0.5+Math.random()*0.25, per:3.4+Math.random()*1.8, ph:Math.random()*4, range:470, half:0.2, det:0}, opt));
+  const [base, add] = kind.split("+");
   let w = 12;
-  if(kind==="pit"){ w=11; for(let i=0;i<w;i++) colF(x0+i); carve(x0+4,x0+6); coins(x0+4,11,3); }
-  else if(kind==="pit2"){ w=14; for(let i=0;i<w;i++) colF(x0+i); carve(x0+3,x0+5); carve(x0+8,x0+10); coins(x0+6,11,2); }
-  else if(kind==="spikes"){ w=13; for(let i=0;i<w;i++) colF(x0+i); for(let c=x0+3;c<=x0+5;c++) g[FL-1][c]="S"; g[FL-1][x0+6]="X"; g[FL-2][x0+6]="X"; g[FL-1][x0+7]="X"; g[FL-2][x0+7]="X"; for(let c=x0+8;c<=x0+10;c++) g[FL-1][c]="S"; coins(x0+6,10,2); }
-  else if(kind==="moving"){ w=14; for(let i=0;i<w;i++) colF(x0+i); carve(x0+3,x0+11);
-    E.push({type:"mover", x:(x0+3)*T, y:FL*T, w:3*T, h:14, a:(x0+3)*T, b:(x0+9)*T, dir:1, sp:80, solid:true, dx:0}); coins(x0+5,10,3); }
-  else if(kind==="laser"){ w=16; for(let i=0;i<w;i++) colF(x0+i);
-    [4,8,12].forEach((c,i)=>E.push({type:"laser", x:(x0+c)*T+16, y1:ce?T:0, y2:FL*T, per:2.4, on:.46, ph:i*0.8+n*0.3})); coins(x0+6,12,4); }
-  else if(kind==="guard"){ w=16; for(let i=0;i<w;i++) colF(x0+i); g[FL-2][x0+4]="X"; g[FL-1][x0+4]="X"; for(let c=x0+5;c<=x0+10;c++) g[11][c]="X";
-    E.push({type:"guard", x:(x0+12)*T, y:FL*T-40, w:22, h:40, a:(x0+6)*T, b:(x0+13)*T, dir:-1, sp:58, wait:0}); coins(x0+6,10,4); }
-  else if(kind==="camera"){ w=17; for(let i=0;i<w;i++) colF(x0+i); for(const c of [x0+4,x0+5,x0+11,x0+12]){ g[FL-1][c]="X"; g[FL-2][c]="X"; }
-    E.push({type:"cam", x:(x0+8)*T+16, y:(ce?T:0)+10, mid:Math.PI/2, amp:0.62, per:4.2, ph:n*1.3, range:470, half:0.2, det:0}); coins(x0+6,12,4); }
-  else if(kind==="crumble"){ w=15; for(let i=0;i<w;i++) colF(x0+i); carve(x0+2,x0+12); for(let c=x0+2;c<=x0+12;c++) g[FL][c]="C"; coins(x0+4,11,5); }
+  const fill = n2 => { w=n2; for(let i=0;i<w;i++) colF(x0+i); };
+  switch(base){
+    case "pit": { fill(11); const gp=R(2,4); carve(x0+4,x0+3+gp); coins(x0+4,11,gp); break; }
+    case "pit2": fill(14); carve(x0+3,x0+5); carve(x0+8,x0+10); coins(x0+6,11,2); break;
+    case "pit3": fill(18); carve(x0+2,x0+3); carve(x0+8,x0+9); carve(x0+14,x0+15); coins(x0+2,11,2); coins(x0+8,11,2); coins(x0+14,11,2); break;
+    case "spikes": fill(13); for(let c=x0+3;c<=x0+5;c++) g[FL-1][c]="S"; block(x0+6,2); block(x0+7,2); for(let c=x0+8;c<=x0+10;c++) g[FL-1][c]="S"; coins(x0+6,10,2); break;
+    case "spikes2": fill(21); for(let c=x0+2;c<=x0+18;c++) g[FL-1][c]="S"; for(const c of [3,4,5,6,9,10,11,12,15,16,17,18]) g[FL-2][x0+c]="X"; coins(x0+7,10,2); coins(x0+13,10,2); break;
+    case "stairs": fill(15); block(x0+3,1); block(x0+4,2); block(x0+5,3); for(let c=x0+6;c<=x0+8;c++) g[FL-1][c]="S"; block(x0+9,3); block(x0+10,3); block(x0+11,2); block(x0+12,1); coins(x0+6,9,3); break;
+    case "moving": { fill(14); carve(x0+3,x0+11); E.push({type:"mover", x:(x0+3)*T, y:FL*T, w:3*T, h:14, a:(x0+3)*T, b:(x0+9)*T, dir:1, sp:R(70,115), solid:true, dx:0, dy:0}); coins(x0+5,10,3); break; }
+    case "elevator": { fill(13); carve(x0+3,x0+5); for(let c=x0+6;c<=x0+9;c++) block(c,6);
+      E.push({type:"mover", axis:"y", x:(x0+3)*T, y:FL*T, w:3*T, h:14, a:(FL-6)*T-6, b:FL*T, dir:-1, sp:R(60,85), solid:true, dx:0, dy:0}); coins(x0+6,6,4); break; }
+    case "spring": { fill(12); block(x0+6,5); block(x0+7,5); E.push({type:"spring", x:(x0+3)*T, y:FL*T-10, w:2*T, h:10, sq:0}); coins(x0+6,6,2); break; }
+    case "laser": fill(16); [4,8,12].forEach((c,i)=>laser(x0+c,{per:2.1+Math.random()*0.7, ph:i*0.8+n*0.3})); coins(x0+6,12,4); break;
+    case "laserFast": fill(17); [3,6,9,12].forEach((c,i)=>laser(x0+c,{per:1.5, on:.42, ph:i*0.35})); coins(x0+4,12,4); break;
+    case "laserTrip": fill(16); trip(x0+3); laser(x0+6,{per:2.2,ph:n}); trip(x0+9); laser(x0+12,{per:2.2,ph:n+1.1}); trip(x0+14); coins(x0+8,11,3); break;
+    case "laserMove": fill(17); trip(x0+4,{mv:true, a:(x0+3)*T+16, b:(x0+13)*T+16, sp:R(90,130), dir:1}); trip(x0+10,{mv:true, a:(x0+3)*T+16, b:(x0+13)*T+16, sp:R(60,90), dir:-1}); coins(x0+6,12,4); break;
+    case "guard": fill(16); block(x0+4,2); for(let c=x0+5;c<=x0+10;c++) g[11][c]="X"; guard(x0+6,x0+13); coins(x0+6,10,4); break;
+    case "guard2": fill(19); block(x0+8,2); block(x0+9,2); guard(x0+2,x0+6,{dir:1,x:(x0+2)*T}); guard(x0+11,x0+16); coins(x0+8,10,2); break;
+    case "camera": fill(17); for(const c of [x0+4,x0+5,x0+11,x0+12]) block(c,2); cam(x0+8); coins(x0+6,12,4); break;
+    case "cam2": fill(20); for(const c of [x0+3,x0+4,x0+9,x0+10,x0+15,x0+16]) block(c,2); cam(x0+6); cam(x0+13,{ph:2}); coins(x0+7,12,2); coins(x0+12,12,2); break;
+    case "crumble": fill(15); carve(x0+2,x0+12); for(let c=x0+2;c<=x0+12;c++) g[FL][c]="C"; coins(x0+4,11,5); break;
+    case "crumbleLong": fill(19); carve(x0+2,x0+16); for(let c=x0+2;c<=x0+16;c++) g[FL][c]="C"; g[FL][x0+9]="X"; coins(x0+5,11,3); coins(x0+12,11,3); break;
+    case "crumbleSpikes": fill(16); for(let c=x0+2;c<=x0+13;c++){ g[FL][c]="C"; g[FL+1][c]="."; g[FL+2][c]="S"; } g[FL][x0+7]="X"; g[FL+1][x0+7]="X"; g[FL+2][x0+7]="X"; coins(x0+4,11,2); coins(x0+9,11,2); break;
+    default: fill(12);
+  }
+  if(add==="laser") laser(x0+Math.floor(w/2)+ (base==="camera"?4:0), {per:2.3, ph:n});
+  if(add==="camera") cam(x0+Math.floor(w/2)-2);
+  if(add==="guard") guard(x0+6, x0+10);
   return w;
 }
 
@@ -574,10 +696,11 @@ function stepPlayer(dt){
     if(P.on || P.coy>0){ P.vy = -JUMP; P.on=false; P.coy=0; P.buf=0; P.jumps=1; P.ride=null; }
     else if(dbl && P.jumps<2){ P.vy = -JUMP*0.9; P.jumps=2; P.buf=0; }
   }
-  if(!K.j && P.vy < -220) P.vy = -220;           /* variable jump height */
+  if(!K.j && P.vy < -220 && !P.boost) P.vy = -220;           /* variable jump height */
+  if(P.vy>=0) P.boost=false;
   P.vy = Math.min(P.vy + GRAV*dt, 900);
   /* ride moving platform */
-  if(P.ride && P.on){ P.x += P.ride.dx; }
+  if(P.ride && P.on){ P.x += P.ride.dx; P.y += P.ride.dy||0; }
   /* X */
   const ox = P.x; P.x += P.vx*dt;
   const top=P.y+2, mid=P.y+P.h/2, bot=P.y+P.h-2;
@@ -595,6 +718,8 @@ function stepPlayer(dt){
     else if(e.type==="mover" && oy >= e.y+e.h-6){ P.y=e.y+e.h; P.vy=0; }
     else if(e.type!=="mover"){ P.x = (P.x+P.w/2 < e.x+e.w/2) ? e.x-P.w-0.01 : e.x+e.w+0.01; }
   }
+  /* springs */
+  for(const e of L.ents) if(e.type==="spring" && P.vy>=0 && P.x+P.w>e.x+2 && P.x<e.x+e.w-2 && P.y+P.h>=e.y-2 && P.y+P.h<=e.y+e.h+2){ P.vy=-940; P.on=false; P.boost=true; P.jumps=1; e.sq=0.25; }
   /* crumble trigger */
   if(P.on){ for(const px of [lx,rx]){ const tx=Math.floor(px/T), ty=Math.floor((P.y+P.h+2)/T); if(tileAt(tx,ty)==="C"){ const k=ty*L.w+tx; if(!L.crumb[k]) L.crumb[k]={t: (G&&G.mode==="heist"&&hasPrize("t"))?0.9:0.5, fallen:false, rt:0}; } } }
   P.anim += Math.abs(P.vx)*dt;
@@ -615,8 +740,12 @@ function stepEnts(dt){
   const smoke = G && G.mode==="heist" && hasPrize("s");
   const jacket = G && G.mode==="heist" && hasPrize("i");
   for(const e of L.ents){
-    if(e.type==="mover"){ const ox=e.x; e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;} if(e.x<e.a){e.x=e.a;e.dir=1;} e.dx = e.x-ox; }
-    else if(e.type==="laser"){ const on = smoke ? e.on*0.62 : e.on; const ph=((time+e.ph)%e.per)/e.per; e.lit = ph<on; e.warn = !e.lit && ph>1-0.14;
+    if(e.type==="mover" && e.wait>0){ e.wait-=dt; e.dx=0; e.dy=0; }
+    else if(e.type==="mover"){ if(e.axis==="y"){ const oy=e.y; e.y += e.dir*e.sp*dt; if(e.y>e.b){e.y=e.b;e.dir=-1;e.wait=1.1;} if(e.y<e.a){e.y=e.a;e.dir=1;e.wait=1.1;} e.dy=e.y-oy; e.dx=0; }
+      else { const ox=e.x; e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;e.wait=0.5;} if(e.x<e.a){e.x=e.a;e.dir=1;e.wait=0.5;} e.dx = e.x-ox; e.dy=0; } }
+    else if(e.type==="spring"){ e.sq=Math.max(0,(e.sq||0)-dt); }
+    else if(e.type==="laser"){ if(e.mv){ e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;} if(e.x<e.a){e.x=e.a;e.dir=1;} }
+      const on = e.trip ? 1 : (smoke ? e.on*0.62 : e.on); const ph=((time+e.ph)%e.per)/e.per; e.lit = ph<on; e.warn = !e.lit && ph>1-0.14;
       if(e.lit && P.dead<=0 && P.x < e.x+4 && P.x+P.w > e.x-4 && P.y+P.h > e.y1 && P.y < e.y2) caught("Laser tripped."); }
     else if(e.type==="guard"){
       if(e.wait>0){ e.wait-=dt; if(e.wait<=0) e.dir*=-1; }
@@ -629,7 +758,7 @@ function stepEnts(dt){
         const cx=P.x+P.w/2, cy=P.y+P.h/2;
         const fx = e.ex + face*e.len, y1 = e.ey-22, y2 = FL*T;
         const inX = face>0 ? (cx>e.ex && cx<fx) : (cx<e.ex && cx>fx);
-        if(inX){ const f = Math.abs(cx-e.ex)/e.len; const top = e.ey + (y1-e.ey)*f, botm = e.ey + (y2-e.ey)*f; if(cy>top && cy<botm) caught("Spotted by the guard."); }
+        if(inX){ const f = Math.abs(cx-e.ex)/e.len; const top = e.ey + (y1-e.ey)*f, botm = e.ey + (y2-e.ey)*f; if(cy>top && cy<botm){ let blocked=false; const st=Math.floor(Math.abs(cx-e.ex)/8); for(let i=1;i<st;i++){ if(solidPt(e.ex+(cx-e.ex)*i/st, e.ey+(cy-e.ey)*i/st)){ blocked=true; break; } } if(!blocked) caught("Spotted by the guard."); } }
       }
     }
     else if(e.type==="cam"){
@@ -688,18 +817,18 @@ function enterHub(msg){
 }
 function startInterview(id){
   const c = byId(id);
-  L = buildRun([{id, qs:c.aud.map(q=>prep(q,id))}]);
+  L = buildRun([{id, qs:shuffle(c.aud.concat(c.past||[])).slice(0,8).map(q=>prep(q,id))}]);
   G = {mode:"aud", id, busts:0, loot:0, correct:0, answered:0, log:[], over:false};
   spawnPlayer(L.spawn.x, L.spawn.y); P.cx=P.x; P.cy=P.y; camX=0; paused=false; hideOv();
-  say(c.crew+": "+EXTRA[id].lvl+". Reach every "+EXTRA[id].term.toLowerCase()+" and answer it.");
+  say(c.crew.replace("The ","")+": Uhm, essentially, reach every "+EXTRA[id].term.toLowerCase()+". I quiz you at each one.");
 }
 function startHeist(){
-  const spec = ORDER.map(id=>({id, qs: shuffle(byId(id).heist).slice(0,PER_ROOM).map(q=>prep(q,id))}));
+  const spec = ORDER.map(id=>({id, haz: shuffle(EXTRA[id].haz).slice(0,PER_ROOM), qs: shuffle(byId(id).heist.concat(byId(id).past||[])).slice(0,PER_ROOM).map(q=>prep(q,id))}));
   L = buildRun(spec);
   G = {mode:"heist", busts:0, loot:0, correct:0, answered:0, log:[], heat:0, over:false,
        covers: hasPrize("m")?2:0, tips: hasPrize("b")?3:0, qtime: QTIME + (hasPrize("t")?20:0)};
   spawnPlayer(L.spawn.x, L.spawn.y); P.cx=P.x; P.cy=P.y; camX=0; paused=false; hideOv();
-  say("You're in. Six rooms, 24 locks. Keep the heat under five.");
+  say("Uhm, okay crew. Essentially: six rooms, 24 locks, keep the heat under five.");
 }
 
 /* =================================================================
@@ -714,43 +843,60 @@ function stopQ(){ if(qTimer){ clearInterval(qTimer); qTimer=null; } }
 function titleScreen(){
   const hired = CREW.filter(c=>S.hired[c.id]).length;
   showOv(`<span class="label">Case file OM-11 · Competition &amp; Strategy</span>
-    <div class="big">Take the <em>moat</em>.</div>
-    <p style="font-size:17px;color:var(--muted);max-width:60ch">Rangmahal Industries has sat behind a wide moat for forty years. You're planning the job from a hideout. Six candidates want in. <b style="color:var(--ink)">Talk to each one and teach them their chapter, then watch them run their interview.</b> Every lock in an interview is an exam-style MCQ. Pass and they join the crew with a prize that changes the heist.</p>
+    <div class="big">Hit <em>Suchir's Liquor Shop</em>.</div>
+    <p style="font-size:17px;color:var(--muted);max-width:60ch">Suchir's Liquor Shop has owned the best corner in town for years, and nobody has cracked it. You're the rookie planning the job. Six master thieves are in town, and each one knows a chapter cold. <b style="color:var(--ink)">Sit with them, ask your questions, and learn how they think.</b> Then pass their trial and they'll join your crew and hand you a piece of kit for the big night.</p>
     <ul class="list">
       <li><b>Walk</b> with arrows or A/D, <b>jump</b> with Space, <b>talk and use</b> with E.</li>
-      <li>Hazards send you back to the last checkpoint. Only answers decide stars: 5 of 8 right gets a candidate hired.</li>
-      <li>The heist mixes every obstacle and draws different questions. Wrong answers and getting caught raise the heat; five heat trips the alarm.</li>
+      <li>Every lock in a trial is an exam-style MCQ. Get 5 of 8 right and the thief joins you. Hazards only send you back to the last checkpoint.</li>
+      <li>The heist mixes every obstacle and asks new questions. Wrong answers and getting caught raise the heat; five heat trips the alarm.</li>
     </ul>
-    <p class="label">${hired} of 6 hired${S.best?` · best heist ${S.best.correct}/24`:''}</p>
+    <p class="label">${hired} of 6 thieves on the crew${S.best?` · best heist ${S.best.correct}/24`:''}</p>
     <div class="btns"><button class="btn go" data-a="hub">${hired?'Back to the hideout':'Enter the hideout'}</button>${hired||S.best?'<button class="btn ghost" data-a="reset">Reset progress</button>':''}</div>`, {kind:"title"});
 }
 
-/* ---------- teaching conversation ---------- */
+/* ---------- learning conversation: the thief teaches, you learn ---------- */
+const OPEN = ["Uhm, okay. Essentially,","Uhm... so, what I mean to say is,","Right. Uhm. Essentially,","Okay, uhm, listen. What I mean to say is,","Essentially, uhm, it's like this."];
+const CLOSE = ["Essentially, that's the whole trick. Uhm, yeah.","What I mean to say is, don't overthink it.","Uhm... essentially, remember that on the job.","Uhm, yeah. What I mean to say is, that's it, essentially.","Essentially. Uhm. Got it?"];
+const NODS = ["Uhm, okay. I think I get it.","Right. Keep going.","Essentially... got it. What's next?","Okay. That makes sense, I think.","Huh. Okay. Go on."];
+const pick = (arr, k) => arr[k % arr.length];
+function chatLine(side, ava, col, name, html, extra){
+  return `<div class="line ${side}"><span class="ava sm" style="background:${col}">${ava}</span><div class="bw"><span class="nm">${name}</span><div class="bub ${extra||''}">${html}</div></div></div>`;
+}
 function talk(id, k){
-  const c = byId(id), ex = EXTRA[id];
+  const c = byId(id), ex = EXTRA[id], thief = c.crew.replace("The ","");
+  const me = (html)=>chatLine("me","YOU","#EDF1F7","You",html);
+  const them = (html,extra)=>chatLine("them",c.ini,ex.col,thief,html,extra);
   if(k===undefined && S.hired[id]){
     showOv(`${whoHtml(c)}
-      <div class="bubble">Ready when you are, boss. I've got the ${esc(ex.prize.toLowerCase())} packed.</div>
+      <div class="chat">
+        ${me("You're on the crew, right?")}
+        ${them(`Uhm, yeah. Essentially, I'm in. What I mean to say is, the ${esc(ex.prize.toLowerCase())} is yours now. Uhm, use it well.`)}
+      </div>
       <div class="prize"><span class="ic">${ex.pic}</span><div><b>${ex.prize}</b><p>${ex.perk}</p></div></div>
-      <p class="label">Best interview: ${starsHtml(S.stars[id]||0)}</p>
-      <div class="btns"><button class="btn" data-a="teach" data-id="${id}">Go over the lessons again</button><button class="btn" data-a="interview" data-id="${id}">Rerun the interview</button><button class="btn go" data-a="close">Back to planning</button></div>`, {kind:"talk"});
+      <p class="label">Best trial: ${starsHtml(S.stars[id]||0)}</p>
+      <div class="btns"><button class="btn" data-a="teach" data-id="${id}">Hear the lessons again</button><button class="btn" data-a="interview" data-id="${id}">Retake the ${esc(ex.lvl.toLowerCase())}</button><button class="btn go" data-a="close">Back to planning</button></div>`, {kind:"talk"});
     return;
   }
   k = k||0; const card = c.brief[k];
   const last = k===c.brief.length-1;
+  const intro = k===0 ? them(`Uhm, so you're the rookie. Essentially, I don't join anyone I haven't taught myself. What I mean to say is, sit down. Ask.`, "soft") : "";
   showOv(`${whoHtml(c)}
     <div class="meta"><span class="label">Lesson ${k+1} of ${c.brief.length} · ${esc(card[0])}</span><span class="dots">${c.brief.map((_,i)=>`<i class="${i<=k?'on':''}"></i>`).join("")}</span></div>
-    <div class="bubble">${esc(ex.ask[k])}</div>
-    <div class="you"><span class="tag">You explain</span>${card[1]}${card[2]?`<div class="said"><span class="who2">Exam tip</span>${card[2]}</div>`:''}</div>
-    ${last?`<div class="bubble">Got it. Put me through the ${esc(ex.lvl.toLowerCase())}. Every ${esc(ex.term.toLowerCase())} I reach, you quiz me.</div>`:''}
+    <div class="chat">
+      ${intro}
+      ${me(esc(ex.ask[k]))}
+      ${them(`<p class="tic">${pick(OPEN,k+id.charCodeAt(0))}</p>${card[1]}<p class="tic">${pick(CLOSE,k*3+id.charCodeAt(0))}</p>`)}
+      ${card[2]?them(`What I mean to say is, uhm... ${card[2]}`,"tip"):''}
+      ${last?them(`Uhm, okay. Essentially, now I test you. Run my ${esc(ex.lvl.toLowerCase())}. Every ${esc(ex.term.toLowerCase())} you reach, I quiz you. Get five of eight and, uhm, what I mean to say is, I'm in.`,"soft"):me(pick(NODS,k))}
+    </div>
     <div class="btns">
       ${k>0?`<button class="btn" data-a="teach" data-id="${id}" data-k="${k-1}">Back</button>`:''}
-      ${last?`<button class="btn go" data-a="interview" data-id="${id}">Start the ${esc(ex.lvl.toLowerCase())}</button>`:`<button class="btn go" data-a="teach" data-id="${id}" data-k="${k+1}">Next</button>`}
-      ${!last?`<button class="btn ghost" data-a="interview" data-id="${id}">Skip to the interview</button>`:''}
+      ${last?`<button class="btn go" data-a="interview" data-id="${id}">Take the ${esc(ex.lvl.toLowerCase())}</button>`:`<button class="btn go" data-a="teach" data-id="${id}" data-k="${k+1}">Ask the next question</button>`}
+      ${!last?`<button class="btn ghost" data-a="interview" data-id="${id}">Skip to the trial</button>`:''}
       <button class="btn ghost" data-a="close">Later</button>
     </div>`, {kind:"talk"});
 }
-function whoHtml(c){ const ex=EXTRA[c.id]; return `<div class="who"><span class="ava" style="background:${ex.col}">${c.ini}</span><div><div class="n">${c.crew}</div><div class="s">${esc(c.src)}</div></div></div>`; }
+function whoHtml(c){ const ex=EXTRA[c.id]; return `<div class="who"><span class="ava" style="background:${ex.col}">${c.ini}</span><div><div class="n">${c.crew}</div><div class="s">Master thief · teaches ${esc(c.src)}</div></div></div>`; }
 
 /* ---------- questions ---------- */
 function openQuestion(term){
@@ -767,17 +913,19 @@ function renderQ(st){
   const head = heist
     ? `<div class="meta"><span class="label">${esc(c.room)} · ${esc(term.label)} · lock ${idx} of ${L.terms.length}</span><span class="label">Heat ${G.heat}/${MAX_HEAT}${G.covers?` · cover ${G.covers}`:''}</span></div>
        ${!answered?`<div class="meta"><span class="label" id="qtxt">${st.left}s</span>${G.tips>0 && !Q.gone?`<button class="btn" data-a="tip" style="padding:5px 10px;font-size:13px">Use stethoscope 50/50 (${G.tips} left)</button>`:''}</div><div class="clock ${st.left<=15?'low':''}"><i id="qbar" style="width:${st.left/G.qtime*100}%"></i></div>`:''}`
-    : `<div class="meta"><span class="label">${esc(c.crew)}'s interview · ${esc(term.label)} ${idx} of ${L.terms.length}</span><span class="label">${G.correct} right so far</span></div>`;
+    : `<div class="meta"><span class="label">${esc(c.crew)}'s trial · ${esc(term.label)} ${idx} of ${L.terms.length}</span><span class="label">${G.correct} right so far</span></div>`;
   const opts = Q.opts.map((o,i)=>{ let cls=""; if(answered){ if(o.c) cls="right"; else if(i===st.picked) cls="wrong"; } else if(Q.gone && Q.gone.includes(i)) cls="gone";
     return `<button class="opt ${cls}" data-a="pick" data-i="${i}" ${answered||(Q.gone&&Q.gone.includes(i))?'disabled':''}><span class="k">${i+1}</span><span>${esc(o.t)}</span></button>`; }).join("");
   let fb = "";
   if(answered){
     const ok = st.picked===ci;
-    fb = `<div class="explain ${ok?'good':'bad'}"><b>${st.picked===-1?'Out of time.':ok?'Correct.':'Not quite.'}</b> ${ok?'':'Answer: '+esc(Q.opts[ci].t)+'. '}${esc(Q.e)}${st.note?`<br><b>${esc(st.note)}</b>`:''}</div>
+    const aud = G.mode==="aud";
+    fb = `<div class="explain ${ok?'good':'bad'}"><b>${st.picked===-1?'Out of time.':ok?(aud?pick(["Uhm, yes. Essentially, correct.","Essentially, yes.","Uhm... correct. Good."],idx):'Correct.'):(aud?pick(["Uhm, no. What I mean to say is,","Not quite. Essentially,","Uhm... no. What I mean to say is,"],idx):'Not quite.')}</b> ${ok?'':'Answer: '+esc(Q.opts[ci].t)+'. '}${esc(Q.e)}${st.note?`<br><b>${esc(st.note)}</b>`:''}</div>
       <div class="btns"><button class="btn go" data-a="qdone" data-focus>${term.style==="safe"?'Swing the door open':'Open the gate'}</button></div>`;
   }
   const icon = term.style==="safe" ? `<span class="label" style="color:var(--brass)">Crack the safe: the dial clicks on the right answer</span>` : "";
-  ovc.innerHTML = `${head}${icon}<p class="q-text">${esc(Q.q)}</p><div class="opts">${opts}</div>${fb}`;
+  const pastTag = Q.src ? `<span class="label" style="color:var(--cyan)">From a past C&amp;S quiz · ${esc(Q.src)}</span>` : "";
+  ovc.innerHTML = `${head}${icon}${pastTag}<p class="q-text">${esc(Q.q)}</p><div class="opts">${opts}</div>${fb}`;
   ovEl.hidden=false; paused=true; for(const k in K) K[k]=false; OV=st;
   const f = ovc.querySelector("[data-focus]") || ovc.querySelector(".opt:not([disabled])"); if(f) f.focus({preventScroll:true});
 }
@@ -810,25 +958,25 @@ function endInterview(){
   S.stars[id] = Math.max(S.stars[id]||0, n); if(hired) S.hired[id]=true; save();
   const misses = G.log.filter(x=>!x.ok);
   showOv(`${whoHtml(c)}
-    <span class="label">Interview result · ${esc(ex.lvl)}</span>
+    <span class="label">Trial result · ${esc(ex.lvl)}</span>
     <div class="score">${G.correct}<small> / ${L.terms.length} right</small></div>
     <div>${starsHtml(n)}</div>
-    ${hired?`<p style="font-size:17px">${first?'Selected. ':''}${c.crew} is on the crew${first?' and gets the prize':''}.</p>
+    ${hired?`<div class="chat">${chatLine('them',c.ini,ex.col,c.crew.replace('The ',''),`Uhm, not bad, rookie. Essentially, I'm in. What I mean to say is, ${first?'take this. You earned it.':'you still have my kit.'}`)}</div>
       <div class="prize"><span class="ic">${ex.pic}</span><div><b>${ex.prize}</b><p>${ex.perk}</p></div></div>`
-      :`<p style="font-size:17px">Not selected yet. You need 5 of 8. Go over the lessons with ${c.crew} and run it again.</p>`}
+      :`<div class="chat">${chatLine('them',c.ini,ex.col,c.crew.replace('The ',''),`Uhm... no. What I mean to say is, not yet. You need five of eight. Essentially, come back, we go over it again, and then you run it again.`)}</div>`}
     <p class="label">Caught ${G.busts} time${G.busts===1?'':'s'} · ${G.loot} loot picked up</p>
     ${misses.length?`<div class="miss">${misses.map(m=>`<div class="m"><span class="qq">${esc(m.q)}</span><span class="aa">Answer: ${esc(m.ans)}</span><span class="ex">${esc(m.e)}</span></div>`).join("")}</div>`:''}
-    <div class="btns"><button class="btn go" data-a="hub">Back to the hideout</button><button class="btn" data-a="interview" data-id="${id}">Run it again</button>${hired?'':`<button class="btn" data-a="teach" data-id="${id}" data-k="0">Go over the lessons</button>`}</div>`, {kind:"result"});
+    <div class="btns"><button class="btn go" data-a="hub">Back to the hideout</button><button class="btn" data-a="interview" data-id="${id}">Run it again</button>${hired?'':`<button class="btn" data-a="teach" data-id="${id}" data-k="0">Hear the lessons again</button>`}</div>`, {kind:"result"});
 }
 function heistIntro(){
   const n = CREW.filter(c=>S.hired[c.id]).length;
   showOv(`<span class="label">The vault door · route: ${ORDER.map(id=>esc(byId(id).room)).join(" → ")}</span>
     <div class="big">The <em>heist</em></div>
-    <p style="color:var(--muted);font-size:16px">24 locks across six rooms, four per chapter, with questions you haven't seen in the interviews. Every obstacle from the tryouts is in here. 60 seconds per lock. Wrong answers and getting caught each add one heat. Five heat and the alarm goes off.</p>
+    <p style="color:var(--muted);font-size:16px">24 locks across six rooms, four per chapter, with questions you haven't seen in the trials. Every obstacle from the tryouts is in here. 60 seconds per lock. Wrong answers and getting caught each add one heat. Five heat and the alarm goes off.</p>
     <div class="tbl"><table class="table"><thead><tr><th>Crew</th><th>Prize</th><th>Effect</th></tr></thead><tbody>
-      ${CREW.map(c=>{const ex=EXTRA[c.id], h=S.hired[c.id];return `<tr><td>${c.crew}</td><td>${h?ex.prize:'<span style="color:var(--muted)">Not hired</span>'}</td><td style="color:${h?'var(--ink)':'var(--muted)'}">${h?ex.perk:'—'}</td></tr>`}).join("")}
+      ${CREW.map(c=>{const ex=EXTRA[c.id], h=S.hired[c.id];return `<tr><td>${c.crew}</td><td>${h?ex.prize:'<span style="color:var(--muted)">Not on the crew</span>'}</td><td style="color:${h?'var(--ink)':'var(--muted)'}">${h?ex.perk:'—'}</td></tr>`}).join("")}
     </tbody></table></div>
-    ${n<6?`<p style="color:var(--alarm)">${6-n} candidate${6-n===1?' is':'s are'} not hired yet. You can go in without their prizes.</p>`:''}
+    ${n<6?`<p style="color:var(--alarm)">${6-n} thie${6-n===1?'f is':'ves are'} not on the crew yet. You can go in without their prizes.</p>`:''}
     <div class="btns"><button class="btn go" data-a="heist">Start the heist</button><button class="btn" data-a="close">Keep planning</button></div>`, {kind:"heistIntro"});
 }
 function endHeist(alarm){
@@ -840,8 +988,8 @@ function endHeist(alarm){
   const weak = rows.filter(r=>r.n).sort((a,b)=>a.ok/a.n-b.ok/b.n)[0];
   const misses = R.log.filter(x=>!x.ok);
   showOv(`<span class="label">Debrief · ${R.answered} locks attempted</span>
-    ${alarm?`<div class="big" style="color:var(--alarm)">Alarm tripped</div><p>Five heat. The crew bailed out. Each run draws fresh questions, so go again.</p>`
-           :`<div class="big">Clean <em>getaway</em></div><p>You took <b style="color:var(--brass)">${share.toFixed(1)}%</b> of Rangmahal's market and ${R.loot} in loot.</p>`}
+    ${alarm?`<div class="big" style="color:var(--alarm)">Alarm tripped</div><p>Five heat. Uhm... essentially, the crew bailed. What I mean to say is, each run draws fresh questions and new obstacles, so go again.</p>`
+           :`<div class="big">Clean <em>getaway</em></div><p>You took <b style="color:var(--brass)">${share.toFixed(1)}%</b> of Suchir's trade and ${R.loot} in loot.</p>`}
     <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:end">
       <div><span class="label">Right</span><div class="score">${R.correct}<small> / ${R.answered}</small></div></div>
       <div><span class="label">Exam equivalent</span><div class="score" style="font-size:clamp(40px,8vw,60px)">${Math.round(R.correct/24*25*10)/10}<small> / 25</small></div></div>
@@ -849,7 +997,7 @@ function endHeist(alarm){
     <div class="tbl"><table class="table"><thead><tr><th>Room</th><th>Chapter</th><th style="text-align:right">Right</th></tr></thead><tbody>
       ${rows.map(r=>{const c=byId(r.id);return `<tr><td>${esc(c.room)}</td><td>${esc(c.src)}</td><td class="n">${r.n?r.ok+'/'+r.n:'—'}</td></tr>`}).join("")}
     </tbody></table></div>
-    ${weak && weak.ok<weak.n?`<p>Weakest room: <b style="color:var(--brass)">${esc(byId(weak.id).room)}</b>. Go over ${esc(byId(weak.id).crew)}'s lessons.</p>`:''}
+    ${weak && weak.ok<weak.n?`<p>Weakest room: <b style="color:var(--brass)">${esc(byId(weak.id).room)}</b>. Sit with ${esc(byId(weak.id).crew)} again.</p>`:''}
     ${misses.length?`<span class="label">What went wrong</span><div class="miss">${misses.map(m=>`<div class="m"><span class="label">${esc(byId(m.tag).room)}</span><span class="qq">${esc(m.q)}</span><span style="color:var(--alarm);font-size:13.5px">You chose: ${esc(m.pick)}</span><span class="aa">Answer: ${esc(m.ans)}</span><span class="ex">${esc(m.e)}</span></div>`).join("")}</div>`:''}
     <div class="btns"><button class="btn go" data-a="heist">Run it again</button><button class="btn" data-a="hub">Back to the hideout</button></div>`, {kind:"result"});
 }
@@ -919,7 +1067,7 @@ function draw(){
   if(P) drawPlayer();
   /* prompt */
   const tgt = !paused && interactTarget();
-  if(tgt){ const lbl = tgt.type==="term" ? (tgt.style==="safe"?"E  crack the safe":"E  use "+tgt.label.toLowerCase()) : tgt.type==="npc" ? "E  talk to "+byId(tgt.id).crew : "E  plan the heist";
+  if(tgt){ const lbl = tgt.type==="term" ? (tgt.style==="safe"?"E  crack the safe":"E  use "+tgt.label.toLowerCase()) : tgt.type==="npc" ? "E  learn from "+byId(tgt.id).crew : "E  plan the heist";
     ctx.font="600 13px 'Martian Mono', monospace"; const w=ctx.measureText(lbl).width+18; const px=tgt.x+tgt.w/2-w/2, py=tgt.y-34;
     ctx.fillStyle="rgba(8,12,22,.88)"; rr(px,py,w,24,5); ctx.fill(); ctx.strokeStyle="#E8B04F"; ctx.stroke(); ctx.fillStyle="#EDF1F7"; ctx.fillText(lbl, px+9, py+16); }
   ctx.restore();
@@ -948,6 +1096,7 @@ function drawEnt(e){
   if(e.x > camX+VW+80 || e.x+ (e.w||0) < camX-200) { if(e.type!=="guard" && e.type!=="cam") return; }
   const t=time;
   if(e.type==="coin"){ if(e.got) return; ctx.fillStyle="#6FD39A"; rr(e.x,e.y+Math.sin(t*4+e.x)*2,12,14,2); ctx.fill(); ctx.fillStyle="#1a4a31"; ctx.fillRect(e.x+5,e.y+2+Math.sin(t*4+e.x)*2,2,10); }
+  else if(e.type==="spring"){ const sq=e.sq>0?4:0; ctx.fillStyle="#6a738c"; ctx.fillRect(e.x+4,e.y+6,e.w-8,4); ctx.strokeStyle="#E8B04F"; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<6;i++){ ctx.moveTo(e.x+8+i*9,e.y+6); ctx.lineTo(e.x+12+i*9,e.y-2+sq); } ctx.stroke(); ctx.lineWidth=1; ctx.fillStyle="#F0604A"; ctx.fillRect(e.x+2,e.y-4+sq,e.w-4,4); }
   else if(e.type==="mover"){ ctx.fillStyle="#8aa0c8"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.fillStyle="#E8B04F"; for(let i=0;i<e.w;i+=16) ctx.fillRect(e.x+i,e.y,8,4); }
   else if(e.type==="term"){
     if(e.style==="safe"){ ctx.fillStyle=e.done?"#3a6b4f":"#5c6474"; rr(e.x-6,e.y+6,42,40,4); ctx.fill(); ctx.fillStyle="#2a2f3a"; ctx.beginPath(); ctx.arc(e.x+15,e.y+26,11,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=e.done?"#6FD39A":"#E8B04F"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x+15,e.y+26,11,0,Math.PI*2); ctx.stroke(); ctx.lineWidth=1;
@@ -962,6 +1111,7 @@ function drawEnt(e){
     ctx.fillStyle="#6FD39A"; ctx.font="700 12px 'Martian Mono', monospace"; ctx.fillText(G.mode==="heist"?"VAN":"EXIT", e.x+(G.mode==="heist"?12:8), e.y-8); }
   else if(e.type==="sign"){ ctx.fillStyle="rgba(8,12,22,.75)"; rr(e.x-10,e.y,230,50,6); ctx.fill(); ctx.strokeStyle="rgba(232,176,79,.6)"; ctx.stroke();
     ctx.fillStyle="#E8B04F"; ctx.font="600 10px 'Martian Mono', monospace"; ctx.fillText(e.sub.toUpperCase(), e.x, e.y+17); ctx.fillStyle="#EDF1F7"; ctx.font="800 22px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(e.text.toUpperCase(), e.x, e.y+41); }
+  else if(e.type==="laser" && e.trip){ ctx.fillStyle="#394260"; ctx.fillRect(e.x-4,e.y1-4,8,e.y2-e.y1+4); ctx.fillStyle="rgba(255,60,60,.3)"; ctx.fillRect(e.x-6,e.y1,12,e.y2-e.y1); ctx.fillStyle="#ff4b3e"; ctx.fillRect(e.x-1,e.y1,2,e.y2-e.y1); }
   else if(e.type==="laser"){ ctx.fillStyle="#394260"; ctx.fillRect(e.x-7,e.y1,14,8); ctx.fillRect(e.x-7,e.y2-8,14,8);
     if(e.lit){ ctx.fillStyle="rgba(255,60,60,.25)"; ctx.fillRect(e.x-6,e.y1+8,12,e.y2-e.y1-16); ctx.fillStyle="#ff4b3e"; ctx.fillRect(e.x-2,e.y1+8,4,e.y2-e.y1-16); }
     else if(e.warn){ ctx.fillStyle=`rgba(255,80,60,${0.3+0.3*Math.sin(t*40)})`; ctx.fillRect(e.x-1,e.y1+8,2,e.y2-e.y1-16); }
@@ -979,11 +1129,11 @@ function drawEnt(e){
     drawPerson(e.x, e.y+4+Math.sin(time*2+e.bob)*1, face, ex.col, ex.coat, ex.hat, 0, {});
     ctx.fillStyle="rgba(8,12,22,.8)"; rr(e.x-26,e.y-40,74,32,5); ctx.fill(); ctx.strokeStyle=hired?"#6FD39A":ex.col; ctx.stroke();
     ctx.fillStyle="#EDF1F7"; ctx.font="800 14px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.textAlign="center"; ctx.fillText(c.crew.replace("The ","").toUpperCase(), e.x+11, e.y-26);
-    ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillStyle=hired?"#6FD39A":"#A5B4CB"; ctx.fillText(hired?("HIRED · "+ex.pic):"WAITING", e.x+11, e.y-14); ctx.textAlign="left";
+    ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillStyle=hired?"#6FD39A":"#A5B4CB"; ctx.fillText(hired?("ON CREW · "+ex.pic):"WILL TEACH", e.x+11, e.y-14); ctx.textAlign="left";
     if(!hired){ ctx.fillStyle=ex.col; ctx.font="900 18px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("!", e.x+8, e.y-46+Math.sin(time*4)*2); } }
   else if(e.type==="board"){ ctx.fillStyle="#2a2034"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.strokeStyle="#9a82bd"; ctx.strokeRect(e.x+.5,e.y+.5,e.w-1,e.h-1);
-    ctx.fillStyle="#EDF1F7"; ctx.font="900 26px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("TARGET: RANGMAHAL INDUSTRIES", e.x+16, e.y+34);
-    ctx.font="600 11px 'Martian Mono', monospace"; ctx.fillStyle="#A5B4CB"; ctx.fillText("Teach 6 candidates · pass their interviews · take the moat", e.x+16, e.y+54);
+    ctx.fillStyle="#EDF1F7"; ctx.font="900 26px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("TARGET: SUCHIR'S LIQUOR SHOP", e.x+16, e.y+34);
+    ctx.font="600 11px 'Martian Mono', monospace"; ctx.fillStyle="#A5B4CB"; ctx.fillText("Learn from 6 master thieves · pass their trials · hit the shop", e.x+16, e.y+54);
     CREW.forEach((c,i)=>{ const x=e.x+16+i*60, y=e.y+70; const h=S.hired[c.id]; ctx.fillStyle=h?EXTRA[c.id].col:"#3a3048"; ctx.fillRect(x,y,48,60); ctx.fillStyle="#0b0f1c"; ctx.font="900 20px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(c.ini, x+10, y+28);
       ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillText(h?EXTRA[c.id].pic:"--", x+16, y+50); ctx.fillStyle="#F0604A"; ctx.beginPath(); ctx.arc(x+24,y-2,3,0,Math.PI*2); ctx.fill(); });
     ctx.strokeStyle="rgba(240,96,74,.6)"; ctx.beginPath(); CREW.forEach((c,i)=>{ const x=e.x+40+i*60, y=e.y+68; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); }
@@ -998,10 +1148,10 @@ function drawHud(th){
   ctx.font="600 11px 'Martian Mono', monospace";
   const pill=(x,y,w,txt,col)=>{ ctx.fillStyle="rgba(8,12,22,.78)"; rr(x,y,w,26,5); ctx.fill(); ctx.fillStyle=col||"#EDF1F7"; ctx.fillText(txt,x+10,y+17); };
   if(!G) return;
-  if(G.mode==="hub"){ const n=CREW.filter(c=>S.hired[c.id]).length; pill(12,12,250,"HIDEOUT · "+n+" of 6 hired"); if(S.best) pill(270,12,190,"BEST HEIST "+S.best.correct+"/24","#E8B04F"); }
+  if(G.mode==="hub"){ const n=CREW.filter(c=>S.hired[c.id]).length; pill(12,12,270,"HIDEOUT · "+n+" of 6 on the crew"); if(S.best) pill(270,12,190,"BEST HEIST "+S.best.correct+"/24","#E8B04F"); }
   else {
     const done = L.terms.filter(t=>t.done).length;
-    const title = G.mode==="heist" ? "HEIST · "+themeAt(P.x).name.toUpperCase() : byId(G.id).crew.toUpperCase()+" · "+EXTRA[G.id].lvl.toUpperCase();
+    const title = G.mode==="heist" ? "HEIST · "+themeAt(P.x).name.toUpperCase() : byId(G.id).crew.replace('The ','').toUpperCase()+"'S TRIAL · "+EXTRA[G.id].lvl.toUpperCase();
     ctx.font="600 11px 'Martian Mono', monospace"; const tw=ctx.measureText(title).width+20; pill(12,12,tw,title,"#E8B04F");
     pill(12,44,230,"LOCKS "+done+"/"+L.terms.length+" · RIGHT "+G.correct);
     const lootTxt="LOOT "+G.loot+" · CAUGHT "+G.busts; const lw=ctx.measureText(lootTxt).width+20; pill(VW-lw-12,12,lw,lootTxt);
