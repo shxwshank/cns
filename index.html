@@ -414,6 +414,7 @@ const CREW = [
 ];
 
 
+
 /* =================================================================
    PAST-PAPER BANK: questions adapted from C&S Quiz 1 (2020, 2021, 2023, 2024),
    limited to what's on this year's syllabus. Format: [q, [correct, wrong x3], explanation, source]
@@ -460,17 +461,12 @@ s:[
  ["Which statement about industry structure is true?",["A consolidated industry tends to be more profitable than a fragmented one","More competitors generally means higher profitability","Industry structures are stable, not dynamic","A few large competitors raise supplier and buyer power"],"Concentration usually mutes price competition.","2020"],
  ["Which is FALSE about the threat of substitutes and switching costs?",["Banks bundling savings and demat accounts decrease customers' switching costs","Customers may switch to a better robotic roti maker even at a higher price","Mobile number portability can cut telecom profits by lowering switching costs","Travel-aggregator users switch airlines more readily than direct bookers"],"Bundling raises switching costs.","2020"],
  ["Which is FALSE about complements?",["Complements decrease customers' switching costs","They may be offered by the same firm or others","They add value when used together","They increase demand for the primary product"],"Complements tend to raise switching costs (think printer and ink).","2020"],
- ["Nutella holds 54% of chocolate spreads though variations are easy to make at home. What best explains its share?",["It is difficult for entrants to scale up operations and bring costs down quickly","Almond and walnut spreads have also been launched","Its Canadian plant resumed after strikes","The spread is easy to make at home"],"Scale economies and brand act as entry barriers.","2020"],
- ["Electricity is a commodity, but huge set-up costs have kept entrants out. Which factor REDUCES utility profitability?",["Very little differentiation, making electricity a commodity","The difficulty for entrants of investing and scaling up","Large fuel contracts that curb supplier power","Regulations protecting incumbents"],"Commodity products push competition toward price. The other three protect incumbents.","2020"],
  ["Which statement about environmental (PESTEL) factors is FALSE?",["A single IT firm can materially change the country's unemployment rate by hiring more","Ride-sharing firms may see ICT changes as threats or opportunities","Pharma firms can shape political factors through lobbying","Beverage firms may add low-calorie options due to sociocultural shifts"],"Individual firms rarely move macroeconomic variables.","2020"],
- ["Newspapers' ad revenues fell about 80% as the internet took off. This erosion of profit is an example of:",["Industry structure change","Hypercompetition","Knowledge intensity","Global markets"],"New substitutes and powerful platforms reshaped the forces.","2021"],
  ["The prevalence of only a few music streaming companies is best explained by:",["Demand-side benefits of scale","Supply-side benefits of scale","Heavy industry regulation","Threat of deterrence"],"Network effects make users and artists gravitate to the biggest platforms.","2024"],
- ["ASML holds 62% of photolithography equipment and alone has mastered EUV. This industry is characterised by:",["Low intra-industry rivalry","Low barriers to entry","High buyer power","Locational advantage"],"Few rivals and a unique technology mute rivalry.","2021"],
  ["___ relates unit cost to the volume produced at a point in time; ___ relates unit cost to cumulative production.",["Economies of scale; experience curve","Experience curve; economies of scale","Economies of scale; competitive advantage","Competitive advantage; economies of scale"],"Both are cost-based sources of incumbent advantage.","2024"]
 ],
 i:[
  ["If industry explains about 20% of profit variation and firm strategy about 55%, what can we conclude?",["Industry and firm analysis are both useful, though together they don't explain everything","Industry analysis is not useful","Firms can improve profit only by switching industries","Profit differences within an industry are always temporary"],"Grant: industry factors explain a small share, but industry analysis still matters for threats and positioning.","2020"],
- ["Lego earns 25% margins while rival Mattel earns under 20%. What can we conclude?",["Margins can vary considerably between firms in the same industry","Online retail is more profitable","A Barbie is easier to copy than a Lego brick","The five forces are weaker for Lego"],"The five forces apply to the whole industry; firm differences come from competitive advantage.","2020"],
  ["Relative to firm-level factors, industry factors account for a ___ share of interfirm profit differences.",["Smaller","Larger","Equal","Undeterminable"],"Differences within industries are larger than those between them.","2024"]
 ],
 q:[
@@ -478,8 +474,6 @@ q:[
  ["For Spotify, the content library and content production are, respectively, a:",["Resource; capability","Capability; resource","Strength; opportunity","Competence; trade-off"],"The library is owned; producing content is what the firm can do.","2021"],
  ["For an airline, superior customer service and premium routes are, respectively, a:",["Capability; resource","Resource; capability","Opportunity; threat","Competence; complement"],"Service is something the firm does; routes (slots) are owned.","2021"],
  ["Which is NOT a resource for an organization?",["Industry rivals","Assets and capabilities","Firm knowledge","Organizational processes"],"Rivals are part of the external environment.","2021"],
- ["ASML alone has harnessed extreme ultraviolet light for chipmaking equipment. This ability is a ___ resource.",["Valuable, rare and inimitable","Rare but not valuable","Valuable but easy to imitate","Common but valuable"],"It passes the demand, scarcity and inimitability tests.","2021"],
- ["ASML's competitive advantage is most likely to erode if:",["Rivals develop the ability to handle shorter wavelengths than ASML","A major buyer integrates backward","Barriers to entry fall","Rivals merge with each other"],"A superior rival resource defeats competitive superiority.","2021"],
  ["A pharma incumbent's product patent is an example of a ___ resource.",["Inimitable","Substitutable","Freely tradable","Fast-depreciating"],"Patents are physically unique in Collis and Montgomery's terms.","2021"],
  ["The level of analysis for the five forces and the resource-based view is, respectively:",["Industry; firm","Firm; industry","Industry; industry","Firm; firm"],"RBV looks inside the firm, the five forces at the industry.","2021"],
  ["Resource heterogeneity means that bundles of resources, capabilities and competencies:",["Differ across firms","Are the same across firms","Are mostly the same across firms","Differ only temporarily"],"No two firms have the same history, so resources differ.","2020"],
@@ -489,8 +483,7 @@ q:[
 t:[
  ["The duration of an industry's life cycle:",["Has become compressed as technological change has accelerated","Typically extends over a century","Is determined by the longevity of the firms in it","Is fixed across countries"],"Grant: life cycles are shortening, especially online.","2024"],
  ["Moving from growth toward decline in the life cycle is characterised by:",["Increased price wars","Increasing product differentiation","Process innovation giving way to product innovation","Rising economies of scale"],"Commoditization and excess capacity push price competition.","2024"],
- ["Early-mover advantage is characterised by:",["Building an exclusive network of suppliers and complementors","An absolute cost advantage","Attracting laggard consumers","High exit barriers for incumbents"],"Early movers can pre-empt scarce partners.","2021/2024"],
- ["After deregulation, BSNL struggled against new telecom entrants. Its main source of disadvantage was:",["Sunk investment in old circuit-switching technology","Competition from private players","Deregulation itself","Low demand for data"],"Legacy assets and routines are a source of inertia: entrants started with the newer technology.","2021"]
+ ["Early-mover advantage is characterised by:",["Building an exclusive network of suppliers and complementors","An absolute cost advantage","Attracting laggard consumers","High exit barriers for incumbents"],"Early movers can pre-empt scarce partners.","2021/2024"]
 ]
 };
 CREW.forEach(c=>{ c.past = (PAST[c.id]||[]); });
@@ -545,6 +538,7 @@ function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").rep
 function starsHtml(n){ return '<span class="stars" aria-label="'+n+' of 3 stars">'+[0,1,2].map(i=>'<i class="'+(i<n?'on':'')+'"></i>').join('')+'</span>'; }
 function starsFor(score,total){ const r=score/total; return r>=0.85?3:r>=0.6?2:r>=0.35?1:0; }
 const hasPrize = id => !!S.hired[id];
+const pool = id => { const c=byId(id); return c.aud.concat(c.heist, c.past||[]); };   /* every question for a chapter, drawn at random */
 
 /* =================================================================
    ENGINE: constants, canvas, input
@@ -820,13 +814,13 @@ function enterHub(msg){
 }
 function startInterview(id){
   const c = byId(id);
-  L = buildRun([{id, qs:shuffle(c.aud.concat(c.past||[])).slice(0,8).map(q=>prep(q,id))}]);
+  L = buildRun([{id, qs:shuffle(pool(id)).slice(0,8).map(q=>prep(q,id))}]);
   G = {mode:"aud", id, busts:0, loot:0, correct:0, answered:0, log:[], over:false};
   spawnPlayer(L.spawn.x, L.spawn.y); P.cx=P.x; P.cy=P.y; camX=0; paused=false; hideOv();
   say(c.crew.replace("The ","")+": Uhm, essentially, reach every "+EXTRA[id].term.toLowerCase()+". I quiz you at each one.");
 }
 function startHeist(){
-  const spec = ORDER.map(id=>({id, haz: shuffle(EXTRA[id].haz).slice(0,PER_ROOM), qs: shuffle(byId(id).heist.concat(byId(id).past||[])).slice(0,PER_ROOM).map(q=>prep(q,id))}));
+  const spec = ORDER.map(id=>({id, haz: shuffle(EXTRA[id].haz).slice(0,PER_ROOM), qs: shuffle(pool(id)).slice(0,PER_ROOM).map(q=>prep(q,id))}));
   L = buildRun(spec);
   G = {mode:"heist", busts:0, loot:0, correct:0, answered:0, log:[], heat:0, over:false,
        covers: hasPrize("m")?2:0, tips: hasPrize("b")?3:0, qtime: QTIME + (hasPrize("t")?20:0)};
