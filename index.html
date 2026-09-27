@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Operation Moat: a heist platformer for revising Competition and Strategy.">
+<title>Operation Moat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=Martian+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --ground:#0B0F1C; --panel:#141B2E; --panel-2:#1B2440; --rule:rgba(143,200,236,.2); --rule-strong:rgba(143,200,236,.45);
+  --ink:#EDF1F7; --muted:#A5B4CB; --cyan:#8FC8EC; --cyan-ink:#06192C;
+  --brass:#E8B04F; --brass-soft:rgba(232,176,79,.15);
+  --alarm:#F0604A; --alarm-soft:rgba(240,96,74,.15);
+  --good:#6FD39A; --good-soft:rgba(111,211,154,.14);
+  --display:"Big Shoulders Stencil Display","Impact","Arial Narrow",sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"Martian Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:14px 40px;display:grid;gap:12px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:900;font-size:28px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+.brand span{color:var(--brass)}
+.keys{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.keys b{color:var(--ink);font-weight:600;border:1px solid var(--rule-strong);padding:1px 5px;border-radius:3px;margin-inline:2px}
+.stage{position:relative;width:100%;max-width:100%;aspect-ratio:960/544;border:1px solid var(--rule-strong);border-radius:6px;overflow:hidden;background:#05070d}
+canvas{display:block;width:100%;height:100%;image-rendering:auto;touch-action:none}
+.pad{display:none;justify-content:space-between;gap:10px;user-select:none;-webkit-user-select:none}
+.pad .grp{display:flex;gap:8px}
+.pad button{min-width:62px;height:58px;border-radius:12px;border:1.5px solid var(--rule-strong);background:var(--panel);font-family:var(--mono);font-weight:600;font-size:13px;touch-action:none;padding:0 12px}
+.pad button.j{background:var(--brass);color:#1B1206;border-color:var(--brass)}
+.pad button.e{border-color:var(--cyan);color:var(--cyan)}
+@media (hover:none),(pointer:coarse),(max-width:760px){.pad{display:flex}}
+.note{color:var(--muted);font-size:13px}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(3,5,10,.72);backdrop-filter:blur(3px);overflow:auto}
+.card{width:100%;max-width:760px;max-height:calc(100vh - 32px);overflow:auto;background:var(--panel);border:1px solid var(--rule-strong);border-radius:8px;padding:22px;display:grid;gap:14px;box-shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+@media (max-width:520px){.card{padding:16px}}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(38px,7vw,64px);line-height:.92}
+.big em{font-style:normal;color:var(--brass)}
+.h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:28px;line-height:1;letter-spacing:.02em}
+.btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1.5px solid var(--rule-strong);background:transparent;border-radius:4px;padding:10px 16px;font-weight:600;font-size:15px}
+.btn:hover{border-color:var(--cyan)}
+.btn.go{background:var(--brass);border-color:var(--brass);color:#1B1206}
+.btn.ghost{border-color:transparent;color:var(--muted);text-decoration:underline;padding-inline:4px}
+.who{display:flex;gap:12px;align-items:center}
+.ava{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:22px;color:#0B0F1C;flex:none}
+.who .n{font-family:var(--display);font-weight:800;font-size:24px;text-transform:uppercase;line-height:1}
+.who .s{font-family:var(--mono);font-size:11px;color:var(--cyan)}
+.bubble{background:var(--panel-2);border:1px solid var(--rule-strong);border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:17px;font-weight:500;max-width:62ch}
+.you{border-left:3px solid var(--brass);padding:4px 0 4px 16px;display:grid;gap:10px;font-size:16px;max-width:66ch}
+.you .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.you b{color:var(--brass);font-weight:600}
+.you ul,.you ol{margin:0;padding-left:20px;display:grid;gap:5px}
+.said{border-left:3px solid var(--cyan);padding:8px 12px;background:rgba(143,200,236,.08);font-size:15px}
+.said .who2{font-family:var(--mono);font-size:10.5px;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px}
+.dots{display:flex;gap:4px}
+.dots i{width:18px;height:4px;background:rgba(143,200,236,.2);border-radius:2px}
+.dots i.on{background:var(--cyan)}
+.q-text{font-size:clamp(17px,2.4vw,20px);font-weight:600;line-height:1.38}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;text-align:left;background:var(--panel-2);border:1.5px solid var(--rule);border-radius:4px;padding:10px 12px;font-size:15.5px}
+.opt:hover:not([disabled]){border-color:var(--cyan)}
+.opt[disabled]{cursor:default}
+.opt .k{font-family:var(--mono);font-size:12px;font-weight:600;width:26px;height:26px;display:grid;place-items:center;border:1px solid var(--rule-strong);border-radius:3px}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--alarm);background:var(--alarm-soft)}
+.opt.gone{opacity:.25;text-decoration:line-through}
+.explain{border-left:3px solid var(--cyan);padding:9px 13px;background:rgba(143,200,236,.07);font-size:15px}
+.explain.good{border-color:var(--good)} .explain.bad{border-color:var(--alarm)}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.clock{height:6px;background:rgba(143,200,236,.15);border-radius:3px;overflow:hidden}
+.clock i{display:block;height:100%;background:var(--cyan);transition:width 1s linear}
+.clock.low i{background:var(--alarm)}
+.stars{display:inline-flex;gap:4px}
+.stars i{width:18px;height:18px;display:block;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:rgba(143,200,236,.22)}
+.stars i.on{background:var(--brass)}
+.prize{display:flex;gap:14px;align-items:center;border:1.5px dashed var(--brass);border-radius:6px;padding:12px 14px;background:var(--brass-soft)}
+.prize .ic{font-family:var(--display);font-weight:900;font-size:26px;width:52px;height:52px;display:grid;place-items:center;border-radius:6px;background:var(--brass);color:#1B1206;flex:none}
+.prize b{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.02em}
+.prize p{color:var(--muted);font-size:14.5px}
+.score{font-family:var(--display);font-weight:900;font-size:clamp(56px,12vw,96px);line-height:.9}
+.score small{font-size:.34em;color:var(--muted)}
+.table{width:100%;border-collapse:collapse;font-size:14.5px}
+.table th,.table td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--rule)}
+.table th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.table td.n{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+.miss{display:grid;gap:8px}
+.miss .m{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:var(--panel-2);display:grid;gap:4px;font-size:14.5px}
+.miss .m .qq{font-weight:600}
+.miss .m .aa{color:var(--good)}
+.miss .m .ex{color:var(--muted);font-size:13.5px}
+.list{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--muted)}
+.list b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.clock i{transition:none}}
+</style>
+</head>
+<body>
+
+
+<main class="wrap">
+  <div class="top">
+    <div class="brand">Operation <span>Moat</span></div>
+    <div class="keys">Move <b>←</b><b>→</b> or <b>A</b><b>D</b> · Jump <b>Space</b> <b>W</b> · Talk / use <b>E</b> · Answers <b>1</b>–<b>4</b></div>
+  </div>
+  <div class="stage"><canvas id="cv" width="960" height="544" aria-label="Operation Moat game screen"></canvas></div>
+  <div class="pad" aria-hidden="true">
+    <div class="grp"><button data-k="l">◀</button><button data-k="r">▶</button></div>
+    <div class="grp"><button class="e" data-k="e">Use</button><button class="j" data-k="j">Jump</button></div>
+  </div>
+  <p class="note">Competition &amp; Strategy · Grant Ch 1, 2, 3, 4, 8 · Porter, What Is Strategy? · Porter, Five Forces · Collis &amp; Montgomery, Competing on Resources. Progress saves in this browser.</p>
+</main>
+<div class="ov" id="ov" hidden><div class="card" id="ovc" role="dialog" aria-modal="true"></div></div>
+
+<script>
+/* Content: Grant (IIMB adaptation) Ch 1,2,3,4,8; Porter 1996, 2008; Collis & Montgomery.
+   MCQ format: [question, [correct, wrong, wrong, wrong], explanation] */
+const CREW = [
+{ id:"m", ini:"MM", crew:"The Mastermind", src:"Ch 1 · Porter, What Is Strategy?", role:"Writes the plan and decides what the crew will not do.",
+  room:"The lobby", roomLine:"Blend in. Everyone in the lobby looks busy. Only some of them have a plan.",
+  brief:[
+   ["What winning strategies share","<p>Grant opens with Queen Elizabeth II and Amitabh Bachchan. Neither succeeded because of <b>superior resources</b> or pure luck. Four elements recur in almost every successful strategy:</p><ul><li><b>Goals that are consistent and long term</b></li><li><b>Profound understanding of the competitive environment</b></li><li><b>Objective appraisal of resources</b></li><li><b>Effective implementation</b></li></ul>","The trap: an option saying success comes from 'superior initial resources'. Grant says the opposite."],
+   ["The basic framework","<p>Strategy is the <b>link between the firm and its industry environment</b>. The firm side holds goals and values, resources and capabilities, and structure and systems. The industry side is the firm's relationships with competitors, customers and suppliers.</p><p><b>Strategic fit</b> means consistency with both sides. Jet Airways stayed a full-service carrier while low-cost IndiGo took the market, and folded in 2019: a misfit with the external environment.</p><p>Grant prefers a simple <b>internal vs external</b> split over SWOT, because labelling a factor as a strength or weakness, opportunity or threat is often <b>arbitrary</b>. Climate change is both a threat and an opportunity for carmakers.</p>",null],
+   ["Where and how to compete","<p>Strategic decisions are <b>important</b>, involve a <b>significant commitment of resources</b>, and are <b>not easily reversible</b>. Tactics are schemes for specific actions; strategy wins the war.</p><ul><li><b>Corporate strategy</b> answers <b>where to compete</b>: scope, diversification, vertical integration, acquisitions. It exploits industry attractiveness.</li><li><b>Business (competitive) strategy</b> answers <b>how to compete</b>: building competitive advantage within an industry.</li></ul><p>Strategy is also described in two dimensions: competing for today (static) and preparing for tomorrow (dynamic), which Abell calls 'managing with dual strategies'.</p>","Two sources of superior profit: being in an attractive industry, and having a competitive advantage within it."],
+   ["Why have a strategy at all","<p>Deep Blue needed no strategy because it could search the whole decision tree. Humans face <b>bounded rationality</b>, so strategy helps as:</p><ul><li><b>Decision support</b>: a heuristic that narrows the options</li><li><b>Coordinating device</b>: communicates direction across the organisation</li><li><b>Target</b>: Hamel and Prahalad's <b>strategic intent</b> deliberately creates a misfit between ambition and resources</li></ul><p>Collis and Rukstad's four statements: <b>mission</b> is why we exist, <b>values</b> are what we believe in, <b>vision</b> is what we want to be, and the <b>strategy statement</b> gives objectives, scope and advantage. Check words against actions: capex, patents, launches, hires.</p>",null],
+   ["Design versus emergence","<p>Mintzberg separates <b>intended</b>, <b>emergent</b> and <b>realized</b> strategy. Only about <b>10 to 30%</b> of intended strategy is realized; emergent decisions by managers adapting to events drive the rest.</p><p>The Honda US motorcycle entry: BCG praised a deliberate cost-leadership plan, but Honda's managers described trial and error. Intel's exit from memory chips started in plant-level decisions before top management adopted it.</p><p>Grant's answer is <b>planned emergence</b>. Stable settings such as Indian Railways can plan in detail; turbulent ones rely on guidelines and simple rules.</p>","History in one line: corporate planning (1960s), then strategic management focused on positioning (Porter, late 1970s), then the resource-based view (1990s)."],
+   ["Operational effectiveness is not strategy","<p>Porter's core distinction:</p><ul><li><b>Operational effectiveness (OE)</b>: performing <b>similar activities better</b> than rivals. TQM, benchmarking, outsourcing, reengineering.</li><li><b>Strategic positioning</b>: performing <b>different activities</b> from rivals, or similar activities <b>in different ways</b>.</li></ul><p>OE is necessary but not sufficient. Best practices diffuse fast, so the <b>productivity frontier</b> shifts outward for everyone. The result is absolute improvement but relative improvement for no one, and <b>competitive convergence</b> as benchmarking makes firms look alike.</p>","Porter says Japanese firms of the 1980s rarely had strategies. They won on OE until the gap closed."],
+   ["Three sources of a position","<ul><li><b>Variety-based</b>: a subset of products or services. Jiffy Lube only does oil changes; Vanguard offers low-cost index-style funds.</li><li><b>Needs-based</b>: most needs of a particular customer group. IKEA for young, style-conscious, budget buyers; Bessemer Trust for families with $5m+.</li><li><b>Access-based</b>: customers reachable in a different way. Carmike Cinemas runs only in towns under 200,000 people.</li></ul><p>Any position needs a <b>tailored set of activities</b>, a difference on the supply side. Differences in customer needs alone do not make a position.</p>",null],
+   ["Trade-offs and fit","<p><b>Trade-offs</b> make a position sustainable because more of one thing means less of another. They arise from inconsistencies in <b>image or reputation</b>, from the <b>activities themselves</b>, and from limits on <b>internal coordination</b>. Continental Lite tried to <b>straddle</b> Southwest's position while staying full-service and lost hundreds of millions. The essence of strategy is <b>choosing what not to do</b>.</p><p><b>Fit</b> among activities drives advantage and sustainability:</p><ul><li><b>First-order</b>: simple consistency with the strategy (Vanguard's cost focus everywhere)</li><li><b>Second-order</b>: activities reinforce each other (Neutrogena's hotel and doctor marketing)</li><li><b>Third-order</b>: optimization of effort (Gap restocking daily from warehouses)</li></ul><p>Matching a whole system is far harder than one activity: 0.9 x 0.9 x 0.9... Positions should last a decade. The <b>growth trap</b> (Maytag) blurs positions; leaders must say no.</p>",null]
+  ],
+  job:{ title:"Sort the plan", intro:"The crew has pitched eight moves. Porter would call some of them operational effectiveness and some genuine strategic positioning. Sort each one.",
+    bins:["Operational effectiveness","Strategic positioning"],
+    items:[
+     ["Rolling out Six Sigma to cut defects to best-practice levels",0,"Doing the same activity better. Rivals can copy it."],
+     ["IKEA making customers pick up and assemble their own furniture",1,"A different set of activities tailored to one customer group."],
+     ["Benchmarking rivals' cycle times and matching them",0,"Benchmarking drives competitive convergence."],
+     ["Bessemer Trust meeting clients on their yachts, one officer per 14 families",1,"Needs-based position with activities configured for it."],
+     ["Buying the same faster printing presses every big rival is buying",0,"Porter's commercial-printing example: gains go to customers and suppliers."],
+     ["Southwest refusing meals and seat assignments to keep 15-minute turnarounds",1,"A trade-off that protects the low-cost, frequent position."],
+     ["Outsourcing IT to the same specialist vendor your rivals use",0,"Shared outsourcing makes activities generic."],
+     ["Vanguard discouraging investors from rapid buying and selling",1,"An activity choice that reinforces its low-cost variety position."]
+    ]},
+  aud:[
+   ["According to Porter, which of these is operational effectiveness rather than strategy?",["Adopting TQM and benchmarking to match industry best practice","IKEA's self-service, flat-pack model","Carmike Cinemas operating only in small towns","Neutrogena selling mainly through drugstores and dermatologists"],"OE means performing similar activities better. The other three are distinct positions built on tailored activities."],
+   ["Carmike Cinemas serving only towns with fewer than 200,000 people is Porter's example of:",["Access-based positioning","Variety-based positioning","Needs-based positioning","Operational effectiveness"],"Customers have similar needs, but reaching them takes a different set of activities: low-cost theatres, central systems, local marketing."],
+   ["Why did Continental Lite fail?",["It straddled: it added low-cost service while keeping conflicting full-service activities","Its aircraft were older than Southwest's","Regulators blocked its point-to-point routes","Southwest priced below cost to drive it out"],"Trade-offs between the two positions meant compromises on travel agents, frequent-flier rewards and gate times hurt both businesses."],
+   ["Which is NOT one of Grant's four common elements of successful strategies?",["A superior initial endowment of resources","Consistent, long-term goals","Profound understanding of the competitive environment","Effective implementation"],"Grant stresses that success seldom comes from superior initial resources. Objective appraisal of resources is the fourth element."],
+   ["Grant prefers a two-way internal/external split to SWOT because:",["Classifying factors as strengths or weaknesses, opportunities or threats is often arbitrary","SWOT ignores the external environment","SWOT cannot be used by not-for-profits","SWOT has been replaced by the five forces"],"Ibrahimovic was both a strength and a weakness; global warming is both a threat and an opportunity for carmakers."],
+   ["According to Mintzberg, a firm's realized strategy is:",["Largely emergent, with only 10 to 30% of intended strategy realized","The same as intended strategy when the firm plans well","Set entirely by the planning department","Unrelated to what managers intend"],"Realized strategy blends a little intended strategy with a lot of emergent adaptation. Grant calls the practical mix 'planned emergence'."],
+   ["Vanguard aligns every activity with low cost: no brokers, low portfolio turnover, bonuses tied to cost savings. This is:",["First-order fit (simple consistency)","Second-order fit (reinforcing activities)","Third-order fit (optimization of effort)","Operational effectiveness"],"First-order fit is consistency between each activity and the overall strategy."],
+   ["Corporate strategy answers ___; business strategy answers ___.",["Where to compete; how to compete","How to compete; where to compete","What to produce; whom to hire","Competing today; competing tomorrow"],"Corporate strategy sets scope. Business (competitive) strategy is about establishing competitive advantage in an industry."]
+  ],
+  heist:[
+   ["Porter's productivity frontier is best described as:",["The maximum value a firm can deliver at a given cost using the best available practices","The industry's average cost and quality","The best performance the firm itself has achieved","The limit of market demand at current prices"],"The frontier shifts outward as best practice improves. OE moves a firm toward it; strategy is about where on it you choose to sit."],
+   ["Which statement is true?",["Trade-offs are essential to strategy because they create the need for choice","Firms facing trade-offs cannot gain a sustainable competitive advantage","A good strategy removes every trade-off","Trade-offs arise only from brand image"],"Trade-offs deter straddlers and repositioners. They come from image, from activities themselves and from coordination limits."],
+   ["In Grant's view, strategic decisions are characterised by:",["Importance, significant commitment of resources, and being hard to reverse","Frequency, routine and delegation","Short time horizons and easy reversal","Being made only by the board"],"These three features separate strategy from tactics."],
+   ["'What we want to be' is the purpose of which statement, in Collis and Rukstad's scheme?",["Vision","Mission","Values","Strategy statement"],"Mission is why we exist, values are what we believe in, vision is what we want to be."],
+   ["For Porter, the sustainability of a strategic position comes mainly from:",["The fit of the whole system of activities","One well-chosen core competence","Continuous benchmarking","Flexibility to respond to every market change"],"Competitors can copy single activities; matching an interlocking system is much less likely."],
+   ["Hamel and Prahalad's idea of strategic intent implies:",["A deliberate misfit between ambitions and current resources","Strict fit between strategy and existing resources","Detailed five-year forecasts","Avoiding stretch goals"],"Strategic intent embraces stretch and leverage, not only strategic fit."],
+   ["Intel's shift from memory chips to microprocessors, begun by plant and business-unit managers, illustrates:",["Emergent strategy later adopted by top management","Corporate planning based on forecasts","Straddling","Operational effectiveness"],"Grant uses Intel to show emergent processes can come before formal strategy."]
+  ]},
+{ id:"b", ini:"BK", crew:"The Bookkeeper", src:"Ch 2 · Goals, Values and Performance", role:"Decides whether the vault is worth the risk.",
+  room:"The counting room", roomLine:"The ledgers are open. Read them right or the numbers lie to you.",
+  brief:[
+   ["Value is not profit","<p>Every firm has its own purpose, but all must <b>create value</b>:</p><p class='said'><span class='who'>Formula</span>Value created = Total customer value - Real costs of production</p><p>Customer value is <b>willingness to pay</b>, not price. The gap between willingness to pay and price is <b>consumer surplus</b>. Producer surplus is profit plus what input owners earn above their minimum, plus taxes.</p><p>So value created is larger than profit. Google creates enormous value with free search while its revenue is far smaller. Value comes from <b>production</b> (transforming inputs) or <b>commerce</b> (arbitrage across space and time).</p>","Past-quiz favourite: value created = total customer value minus real cost of production. Not revenue minus cost."],
+   ["Shareholders or stakeholders?","<p><b>Stakeholder theory</b>: maximise total value for all constituents. Two practical difficulties:</p><ul><li><b>Measuring performance</b>: 'multiple objectives is no objective' (Jensen)</li><li><b>Corporate governance</b>: who judges management, and how?</li></ul><p>Grant adopts <b>long-run profit (enterprise value)</b> as the working goal, for three reasons: <b>competition</b> erodes the luxury of other goals, the <b>threat of acquisition</b> (Cadbury taken by Kraft), and <b>convergence</b> of stakeholder interests over the long term.</p>","Jensen: enlightened shareholder value maximization is identical to enlightened stakeholder theory."],
+   ["Which profit?","<ul><li><b>Accounting profit</b>: gross, operating, net</li><li><b>Economic profit</b> (rent) = operating profit - (capital employed x WACC). It is the surplus after <b>all</b> inputs, <b>including capital</b>, are paid.</li><li><b>Cash flow</b>: operating cash flow, free cash flow; EBITDA is a proxy</li></ul><p>McKinsey found 47% of the world's top 3000 companies earning negative economic profit. <b>EVA</b> at Diageo showed slow-maturing malts and cognac tied up capital, so advertising moved to fast-selling vodka, gin and Baileys, and Pillsbury and Burger King were sold.</p>","Trap: 'economic profit is the surplus after all inputs excluding capital'. It includes capital."],
+   ["Enterprise value","<p>Profit maximization over time means maximizing the <b>value of the firm</b>: the NPV of free cash flows discounted at <b>WACC</b>.</p><p class='said'><span class='who'>Formula</span>Enterprise value = Market capitalization of equity + Market value of debt</p><p>Grant targets enterprise value rather than share price, because a myopic market can reward short-term earnings and financial manipulation. McKinsey shows value can be projected from <b>ROCE and revenue growth</b>.</p>",null],
+   ["Appraise, then diagnose","<p><b>Forward-looking</b>: stock market value is the best available estimate of future cash flows. <b>Backward-looking</b>: accounting ratios such as ROCE, ROE, ROA, compared over time, against rivals and against the <b>cost of capital</b>.</p><p>Diagnosis disaggregates return on assets:</p><p class='said'><span class='who'>Formula</span>ROA = Profit/Sales x Sales/Assets (margin x asset turnover)</p><p>UPS out-earned FedEx through both a higher operating margin and higher fixed-asset turnover, helped by its ground-heavy mix. The worse the performance, the more the focus shifts to the short term.</p>",null],
+   ["Setting targets","<ul><li><b>Financial disaggregation</b>: cascade ROCE drivers down to functions and departments</li><li><b>Balanced scorecard</b> (Kaplan and Norton), four perspectives: <b>financial</b>, <b>customer</b>, <b>internal business</b>, <b>innovation and learning</b></li><li><b>Strategic profit drivers</b>: John Kay's <b>obliquity</b>. Pursue profit indirectly by targeting the drivers of profit.</li></ul><p>Chasing profit directly can backfire. Boeing's shift to a 'value-based environment' under Condit lost it leadership to Airbus; the NHS hit ambulance time targets with single paramedics in cars without saving more lives.</p>",null],
+   ["Values and CSR","<p>Friedman: the one social responsibility of business is to increase profits within the rules. At the other end, the 'social entity' view. Grant takes the middle ground.</p><p>Porter and Kramer's <b>strategic CSR</b> rests on three arguments: <b>sustainability</b>, <b>reputation</b>, and <b>licence to operate</b>. <b>Shared value</b> expands the total pie rather than redistributing it: improving cocoa-growing efficiency raised farmer incomes about 300%, versus 10 to 20% from fair-trade pricing. India's CSR rule requires qualifying firms to spend 2% of average net profit.</p>",null],
+   ["Real options","<p>Flexibility has value in an uncertain, irreversible world. Option value <b>rises with uncertainty</b>, <b>time to expiry</b> and the interest rate; it <b>falls with a higher exercise price</b> (investment cost) and with value leakage over the option period.</p><ul><li><b>Growth options</b>: small bets on future opportunities. <b>Platform investments</b> (3M nanotechnology), <b>alliances and joint ventures</b> (Starbucks China JV), <b>organizational capabilities</b> (Fujifilm thin-film coatings)</li><li><b>Flexibility options</b>: designs that adapt, such as flexible manufacturing lines</li></ul><p>Phase-and-gate development creates options to continue, amend, wait or abandon. Merck calls early research an 'entry fee'.</p>",null]
+  ],
+  job:{ title:"Read the ledger", intro:"You are diagnosing why a rival earns a low return on assets. ROA = margin x asset turnover. Put each ratio on the right branch of the tree.",
+    bins:["Margin (profit / sales)","Asset turnover (sales / assets)"],
+    items:[
+     ["Cost of goods sold / sales",0,"A cost ratio on the margin branch."],
+     ["Inventory turnover",1,"How hard stock works: an asset-utilisation ratio."],
+     ["SG&A expense / sales",0,"Selling, general and admin costs cut into margin."],
+     ["Fixed asset (PPE) turnover",1,"UPS beat FedEx partly here."],
+     ["Depreciation / sales",0,"Grant places depreciation on the margin side."],
+     ["Receivables collection period",1,"Debtor turnover sits on the capital side."],
+     ["Employee costs / sales",0,"UPS had a higher ratio here yet a higher overall margin."],
+     ["Cash and working capital turnover",1,"Capital tied up per rupee of sales."]
+    ]},
+  aud:[
+   ["Value created by a firm equals:",["Total customer value minus the real cost of production","Revenue minus cost","Consumer surplus minus producer surplus","Consumer surplus plus profit"],"Customer value is measured by willingness to pay. Value created is shared as consumer surplus, profit, taxes and input owners' surplus."],
+   ["Economic profit differs from accounting profit because it:",["Deducts the cost of all capital employed","Excludes depreciation","Is measured before tax","Adds consumer surplus"],"Economic profit = operating profit minus capital employed x WACC. It is the surplus after all inputs, including capital."],
+   ["Enterprise value is:",["Market value of equity plus market value of debt","Book equity plus long-term debt","Market capitalization minus debt","The present value of dividends only"],"It equals the NPV of free cash flows to the firm discounted at WACC."],
+   ["Which is NOT a perspective of the balanced scorecard?",["Supplier perspective","Customer perspective","Internal business perspective","Innovation and learning perspective"],"The four are financial, customer, internal business, and innovation and learning."],
+   ["The value of a real option increases when:",["Uncertainty about the project increases","The investment cost (exercise price) rises","The time to expiry shortens","The project's value leaks away during the option period"],"Uncertainty and time both raise option value; a higher exercise price and value leakage lower it."],
+   ["Your ROA trails a rival's but operating margins are equal. Where should the diagnosis go next?",["Asset utilisation: fixed-asset, inventory and receivables turnover","Advertising spend","The tax rate","Dividend policy"],"ROA = margin x turnover. With equal margins, the gap must be on the turnover branch."],
+   ["John Kay's principle of obliquity suggests firms should:",["Target the strategic drivers of profit rather than profit itself","Maximise quarterly profit","Ignore profit entirely","Tie every bonus to the share price"],"Direct profit targets often produce behaviour that undermines profit, as Boeing's experience showed."],
+   ["Grant's main objection to pursuing all stakeholders' interests is that:",["Performance becomes hard to measure and management hard to hold accountable","It always lowers profit","It is illegal outside continental Europe","It ignores customers"],"'Multiple objectives is no objective.' Governance becomes vague when every group's interests must be balanced."]
+  ],
+  heist:[
+   ["Diageo's use of EVA led it to:",["Shift advertising to fast-selling spirits because slow-maturing malts tied up costly capital","Increase investment in vintage cognac","Stop measuring divisional profit","Cut prices across all brands"],"Charging divisions for capital showed high-margin aged drinks were less profitable than believed."],
+   ["Consumer surplus is:",["The difference between what customers are willing to pay and what they actually pay","Price minus unit cost","Employees' pay above their minimum","Taxes paid to government"],"The stronger the competition, the more value goes to customers as consumer surplus."],
+   ["Porter and Kramer's 'shared value' means:",["Creating economic value in a way that also expands value for society","Paying farmers a higher price for the same crop","Giving 2% of profit to charity","Sharing profits equally among stakeholders"],"Shared value expands the pool. Fair trade redistributes it."],
+   ["For a public company, Grant's best available forward-looking performance measure is:",["Stock market valuation","Return on sales","Return on equity","EBITDA"],"Market value is an imperfect but risk-adjusted estimate of the firm's future cash flows."],
+   ["Which of these is a growth option?",["3M's nanotechnology platform that can seed products across many businesses","A flexible line that can switch between car models","A sale-and-leaseback of aircraft","A share buyback"],"Platform investments, alliances and capabilities are growth options. A flexible line is a flexibility option."],
+   ["Which is NOT one of Grant's justifications for focusing on long-run profit?",["Profit maximization always matches the social good","Competition limits the scope for other goals","The threat of acquisition disciplines managers","Stakeholder interests converge over the long run"],"Grant acknowledges conflicts between profit and social good and discusses CSR for exactly that reason."],
+   ["Which statement is true?",["Economic profit is the surplus available after all inputs, including capital, are paid for","Economic profit ignores the cost of capital","Accounting profit always exceeds cash flow","Free cash flow is operating profit plus capital expenditure"],"Economic profit is also called economic rent. Free cash flow is operating cash flow minus capital investment."]
+  ]},
+{ id:"s", ini:"SC", crew:"The Scout", src:"Ch 3 · Porter, Five Competitive Forces", role:"Cases the building and reads every wall.",
+  room:"The outer walls", roomLine:"Five walls stand between you and the vault. Each one pushes back differently.",
+  brief:[
+   ["The industry is the core","<p>PESTLE-style scanning overloads you. What matters is how macro forces reach the firm's <b>customers, suppliers and competitors</b>. Industry profit depends on value to customers, intensity of competition, bargaining power, substitutes and complements, and regulation.</p><p>Industries sit on a spectrum from <b>monopoly</b> (IRCTC in rail ticketing) to <b>perfect competition</b> (US farming, about 3% ROE). Most are oligopolies. Porter measures profitability as <b>ROIC relative to cost of capital</b>, averaged over a full business cycle.</p>",null],
+   ["Five forces, two directions","<p><b>Horizontal</b>: substitutes, new entrants, established rivals. <b>Vertical</b>: buyer power, supplier power.</p><p><b>Substitutes</b> cap prices. Their threat depends on relative <b>price-performance</b> and the buyer's <b>switching cost</b>. Chennai to Bengaluru is 45 minutes by air and 5 hours by train or bus, so rail and road fares must stay lower.</p><p class='said'><span class='who'>Porter 2008</span>It is the <b>threat</b> of entry, not whether entry actually occurs, that holds down profitability.</p><p>A <b>contestable</b> market has no sunk costs, so hit-and-run entry keeps prices competitive whatever the number of firms.</p>","Quiz style: 'It is the threat of entry, not whether entry actually occurs, that holds down profitability' was the correct answer in 2023."],
+   ["Barriers to entry","<ul><li><b>Capital requirements</b> (Boeing and Airbus; cheap for smartphone apps)</li><li><b>Economies of scale</b>: supply-side (spread fixed cost) and demand-side, i.e. <b>network effects</b> (eBay, Facebook)</li><li><b>Incumbency advantages independent of size</b>: raw materials, patents, learning, location</li><li><b>Product differentiation</b> and brand loyalty</li><li><b>Access to distribution channels</b></li><li><b>Restrictive government policy</b>: pre-1991 Indian licensing</li><li><b>Expected retaliation</b></li></ul><p>Barriers are relative to the entrant: Google vaulted barriers that stop start-ups. Low barriers invite floods: Bengaluru went from 1 microbrewery in 2009 to about 60 in 2019.</p>","Barriers to entry and barriers to exit are separate. High entry barriers do not imply high exit barriers."],
+   ["Rivalry among competitors","<ul><li><b>Concentration</b>: four-firm ratio, HHI. Concentrated markets tend toward muted price competition, though evidence on profit is weak.</li><li><b>Diversity of competitors</b> makes coordination harder</li><li><b>Differentiation and switching costs</b>: Titan turned gold jewellery into a brand</li><li><b>Excess capacity</b>: slow growth means fights for share</li><li><b>Exit barriers</b>: specialized assets, job protection, emotion keep capacity in and intensify rivalry</li><li><b>High fixed costs, low marginal costs</b>: airlines fill seats at almost any price</li></ul><p>Porter 2008: rivalry is most destructive when it gravitates to <b>price</b>. It can be <b>positive-sum</b> when rivals serve different segments.</p>","Past quiz: high exit barriers lead to high rivalry. Concentrated industries: low rivalry, high profitability."],
+   ["Buyers and suppliers","<p>Buyer power = <b>price sensitivity</b> x <b>intrinsic leverage</b>.</p><ul><li>Price sensitivity rises when the item is a <b>large share of the buyer's costs</b>, when buyers compete hard, and when it matters little to the quality of the buyer's product (dentists do not haggle over implants).</li><li>Leverage rises with buyer <b>concentration and volume</b>, low <b>switching costs</b>, <b>undifferentiated</b> products, good <b>information</b>, and a credible <b>backward integration</b> threat.</li></ul><p>Suppliers mirror this: concentration relative to the industry, switching costs, differentiated inputs, no substitutes, <b>forward integration</b> threat, and <b>low dependence on the industry</b>. Intel and Microsoft took most of the PC industry's profits.</p>",null],
+   ["Complements","<p>Complements are consumed together: printers and ink, apps and phones. Grant notes they can be treated as a <b>sixth force</b>. Porter 2008 says complements are <b>not</b> a sixth force, and neither is <b>government</b>: trace their effect through the five forces instead.</p><p>Value goes to whoever builds the stronger, more exclusive position. Apple takes 30% of app revenue; Nintendo controlled its games; IBM's open PC architecture let Microsoft capture the value. Complementor power depends on relative concentration, influence on demand, <b>asymmetric threats of integration</b> (BCCI's IPL over broadcasters), relative switching costs, ease of unbundling, and market growth.</p>","Watch which author a question cites. Grant allows a sixth force; Porter rejects it."],
+   ["From analysis to action","<ol style='margin:0;padding-left:20px;display:grid;gap:6px'><li><b>Forecast</b>: explain today's profit from structure, identify structural trends, predict the effect on each force.</li><li><b>Alter structure</b>: mergers (Indian PSU bank consolidation), frequent-flier schemes, advertising as an entry barrier (Coke and Pepsi spend about $4bn a year).</li><li><b>Position</b> where forces are weakest: Paccar serves owner-operator truckers and earns a 10% price premium.</li></ol><p>Porter's pitfalls: assuming fast <b>growth</b> means attractive, or that high <b>technology</b> means attractive; making lists instead of analysis; static analysis; confusing cyclical with structural change; using the framework to declare an industry good or bad instead of guiding choices.</p>","Five forces explains average industry profitability, not differences between firms in the same industry."],
+   ["Boundaries and key success factors","<p>Define industries by <b>substitutability</b> on both sides. Fridges, microwaves and dishwashers are not demand substitutes, but the same plants and channels make them, so <b>supply-side</b> substitutability puts them in one appliance industry. Geographic scope: if price gaps between locations are eroded by substitution, it is one market.</p><p>The five forces is <b>not very sensitive</b> to boundary choice: whatever falls outside the box shows up as a substitute or potential entrant.</p><p><b>Key success factors</b> come from two questions: <b>What do customers want?</b> and <b>How does a firm survive the competition?</b> (Ohmae's forestry: own forests, maximise yield.) Profitability modelling works too: airline profit per seat-mile = yield x load factor - unit cost.</p>","Past quiz: appliance makers share an industry because they face the same five forces, not because the products substitute."]
+  ],
+  job:{ title:"Case the walls", intro:"Your scout reports ten facts from different industries. Tag each with the force it acts on most directly.",
+    bins:["Threat of entry","Rivalry","Buyer power","Supplier power","Substitutes"],
+    items:[
+     ["eBay users want the marketplace with the most other users",0,"Demand-side economies of scale (network effects) are an entry barrier."],
+     ["Specialised plants that can't be redeployed keep losing firms in the market",1,"Exit barriers keep excess capacity in and intensify rivalry."],
+     ["A new airline needs a government licence to fly",0,"Restrictive government policy is an entry barrier."],
+     ["Three supermarket chains buy most of a biscuit maker's output",2,"Buyer concentration and volume give leverage."],
+     ["Only one firm makes the chip your product depends on",3,"A concentrated supplier of an input with no substitute."],
+     ["Video calls replace business trips at a fraction of the cost",4,"A better price-performance trade-off from outside the industry."],
+     ["An empty seat costs the airline almost nothing to fill",1,"High fixed and low marginal costs push price competition."],
+     ["Beer companies threaten to make their own cans",2,"A credible backward integration threat by buyers."],
+     ["Switching from a branded drug to its generic costs the patient nothing",4,"Low switching cost to the substitute."],
+     ["There is no good alternative to a trained airline pilot",3,"No substitute for the supplier's input: pilots' unions hold power."]
+    ]},
+  aud:[
+   ["Facts: cartons are a big cost item for juice makers. Carton makers are few and concentrated. Juice is a small share of carton makers' sales. What follows?",["Carton makers hold the bargaining power; juice makers are price sensitive but lack leverage","Juice makers hold the bargaining power","The facts cancel out","Only the first fact matters"],"The first fact makes juice makers bargain hard. The second and third give carton makers leverage: concentration and low dependence on the industry."],
+   ["High exit barriers in an industry lead to:",["Intense rivalry","Low industry concentration","High entry barriers","High industry attractiveness"],"Capacity that cannot leave keeps prices down as weak firms hang on."],
+   ["Which does NOT increase supplier power?",["The supplier depends heavily on the industry for its revenue","Suppliers are more concentrated than the industry","Inputs are differentiated","Suppliers can credibly integrate forward"],"A supplier that depends on an industry will price reasonably to protect it."],
+   ["A contestable market is one where:",["There are no sunk costs, so the threat of hit-and-run entry keeps prices competitive","There are many firms","A single firm is protected by a patent","Government sets prices"],"Contestability depends on free entry and exit, not on the number of firms."],
+   ["In Porter's 2008 article, government is:",["Not a sixth force; its policies should be analysed through their effect on the five forces","A sixth force that always lowers profitability","A sixth force that always raises profitability","Irrelevant to industry structure"],"Patents raise entry barriers; pro-union policies raise supplier power. Porter treats complements the same way."],
+   ["Refrigerator, microwave and dishwasher makers are treated as one domestic appliance industry because:",["They face similar five forces: similar suppliers, customers and value chains, so supply-side substitution applies","Customers treat the products as substitutes","Government classifies them together","Most firms make all three"],"Consumers don't swap a fridge for a dishwasher, but manufacturers can switch plants and channels."],
+   ["Paccar serving owner-operator truck drivers with premium custom trucks illustrates:",["Positioning the company where the competitive forces are weakest","Reshaping industry structure for everyone","Expanding the industry profit pool","Exploiting a change in technology"],"Owner-operators have little buyer power and are less price sensitive. Paccar earns a 10% premium."],
+   ["Key success factors are identified by asking:",["What customers want and how a firm survives the competition","Which firm has the largest assets","What the government wants","Which segment is growing fastest"],"Grant's framework combines analysis of demand with analysis of competition."]
+  ],
+  heist:[
+   ["Price competition is most likely when:",["Fixed costs are high and marginal costs are low","Products are highly differentiated","Industry demand is growing fast","Buyers face high switching costs"],"Firms cut price toward marginal cost to fill capacity, as in airlines and basic materials."],
+   ["Average industry profitability is likely to be highest when:",["All five forces are weak","All five forces are strong","Rivalry is weak but buyers and suppliers are strong","Entry and substitutes are strong but rivalry is weak"],"Every strong force takes a share of the value created."],
+   ["The five forces framework is best suited to:",["Assessing an industry's average profitability","Explaining profit differences between firms in the same industry","Valuing a single firm's shares","Judging managerial quality"],"Industry analysis explains average profit. Firm differences come from competitive advantage."],
+   ["A steep excise duty on cigarettes is likely to:",["Both reduce demand and deter new entrants","Only reduce demand","Only deter entrants","Have no structural effect"],"Higher prices cut volume, while compliance and capital burdens raise entry barriers."],
+   ["Which is a demand-side economy of scale?",["Buyers valuing a network more because more others use it","Spreading R&D over more units","Bulk discounts from suppliers","Learning-curve cost reductions"],"Network effects make customers reluctant to buy from a small newcomer."],
+   ["Complementors capture more of the value when:",["Users can switch between industry rivals more easily than between complementors","Customers can easily buy and use the product without the complement","The industry is far more concentrated than the complementors","Only the industry can integrate into the complementors' business"],"Relative switching costs favour the side that is harder to replace."],
+   ["Which is a common pitfall Porter warns about in industry analysis?",["Assuming a fast-growing industry is always attractive","Quantifying the forces","Looking at the full business cycle","Separating structural from cyclical change"],"Growth can attract entrants and empower suppliers. The other three are good practice."]
+  ]},
+{ id:"i", ini:"IM", crew:"The Inside Man", src:"Ch 4 · Further Topics", role:"Reads the guards and knows how they'll react.",
+  room:"The guard post", roomLine:"The guards are watching you, and they're thinking about what you'll do next.",
+  brief:[
+   ["Where the five forces run out","<p>Industry factors explain <b>less than 20%</b> of the variation in firm profitability. Differences within industries are larger than differences between them. Industry analysis still matters for threats, segments and sources of advantage.</p><ul><li><b>Hypercompetition</b> (D'Aveni): rapid moves erode advantage; Schumpeter's 'gale of creative destruction'. Evidence of a general rise is mixed.</li><li><b>Winner-take-all</b> industries: positive feedback from <b>network externalities</b> makes market share decisive (Google search, console leaders).</li></ul>","Past quiz: industry factors account for a relatively small share of profit differences between firms."],
+   ["Ecosystems and business models","<p>A <b>business ecosystem</b> is the wider community of organizations that affect the firm. Jacobides: value migrates, and firms can win <b>bottlenecks</b>:</p><ul><li><b>Guardian of quality</b>: Intel Inside, NutraSweet</li><li><b>Become irreplaceable</b>: Apple atomizes its suppliers' roles</li><li><b>Ride changing customer needs</b>: Paytm, PhonePe</li><li><b>Redefine the value chain</b>: IKEA shifted assembly to customers</li></ul><p>A <b>business model</b> is the core logic for creating value and converting it to profit. The <b>Business Model Canvas</b> maps partners, activities, resources, value proposition, relationships, channels, segments, costs and revenues. IndiGo: one aircraft type (A320), extreme unbundling, sale-and-leaseback financing.</p>",null],
+   ["The value capture model","<p>Place the firm in its network of transacting parties.</p><ul><li><b>Upper limit</b> on the value it can capture: the value it adds to its current network, i.e. how much total value falls if it leaves.</li><li><b>Lower limit</b>: the value it could add to an alternative network.</li></ul><p>Moves with <b>competitive intent</b> raise the value the firm adds. Moves with <b>persuasive intent</b> affect how much others will concede. The model rests on cooperative game theory.</p>",null],
+   ["The prisoners' dilemma","<p>Game theory frames interdependence: players, value added, rules, options, payoffs, sequence.</p><p>Coca-Cola and Pepsi each choose a big or small advertising budget. Both would do best with small budgets, but each fears the other will go big. Both go big: a <b>Nash equilibrium</b>, where no player gains by changing strategy alone, reached through a <b>maxi-min</b> choice.</p><p>Escapes: turn a one-off game into a <b>repeated game</b>, or change payoffs through <b>deterrence</b>.</p>",null],
+   ["Five ways to shape the game","<ul><li><b>Cooperation</b>: Brandenburger and Nalebuff's <b>co-opetition</b>. Coke and Pepsi share school policies; Exxon and Shell run joint ventures.</li><li><b>Deterrence</b>: must be <b>credible</b>. A price-war threat hurts the incumbent more than the entrant; excess capacity is more credible (Monsanto before NutraSweet patents expired).</li><li><b>Commitment</b>: eliminating options. Cortés burned his ships; Airbus advertised the A380 early. Hard commitments are aggressive, soft ones moderate competition.</li><li><b>Changing the structure</b>: alliances, Tesla opening its patents.</li><li><b>Signaling</b>: selective information, misinformation (Operation Mincemeat), reputation (P&G's diaper wars), preannounced prices.</li></ul><p>Limits: stylized models give <b>no or multiple equilibria</b> and are sensitive to assumptions. Game theory is better at <b>explaining the past</b> than predicting.</p>",null],
+   ["Competitor analysis","<p>Porter's framework asks four things about a rival to predict its moves and reactions:</p><ul><li><b>Current strategy</b>: what it says and what it does</li><li><b>Objectives</b>: market share goals make a fiercer rival; state-owned firms may ignore profit</li><li><b>Assumptions about the industry</b>: industry recipes create <b>blindspots</b></li><li><b>Resources and capabilities</b></li></ul><p>BSA and Harley-Davidson dismissed small Japanese bikes in the 1960s. By 1980 BSA and Triumph had stopped production. Competitive intelligence is legitimate; the line with industrial espionage is blurry.</p>",null],
+   ["Segmentation","<p>Five stages:</p><ol style='margin:0;padding-left:20px;display:grid;gap:4px'><li>Identify key segmentation variables (buyer and product characteristics), combining correlated ones</li><li>Construct a segmentation matrix</li><li>Analyse segment attractiveness with the five forces. Entry comes from other segments, blocked by <b>mobility barriers</b></li><li>Identify each segment's KSFs</li><li>Choose segment scope: broad when KSFs are similar and costs are shared</li></ol><p>Unoccupied segments are the heart of <b>blue ocean strategy</b>. <b>Vertical segmentation</b> (Bain's profit pools) maps profit along the value chain.</p>","Past quiz: the purpose of segmentation analysis is to identify attractive segments, select strategies for each, and decide how many to serve."],
+   ["Strategic groups","<p>A <b>strategic group</b> is the firms following the same or similar strategy on key dimensions. Indian airlines split into full-service carriers (Air India, Vistara) and low-cost carriers (IndiGo, SpiceJet).</p><p>Evidence of <b>sustained profit differences between groups is limited</b>: members may not even compete with each other (low-cost carriers on different routes). Strategic groups are mainly useful for understanding <b>positioning and patterns of competition</b>.</p>","A strategic group is not the same as a segment, and has nothing to do with collusion."]
+  ],
+  job:{ title:"Read the guards' moves", intro:"Game theory names five kinds of strategic behaviour. Match each move to its type.",
+    bins:["Cooperation","Deterrence","Commitment","Signaling","Changing the game"],
+    items:[
+     ["Monsanto builds unneeded aspartame capacity before its patents expire",1,"Excess capacity makes a threat of aggressive pricing credible."],
+     ["Cortés destroys his ships on arrival in Mexico",2,"Eliminating the retreat option."],
+     ["Airbus advertises the A380 heavily before finishing its design",2,"Visible sunk spending signals it won't back out."],
+     ["Rivals preannounce price rises weeks in advance",3,"Communicating intentions to invite matching."],
+     ["Coca-Cola and Pepsi agree common policies on soda in schools",0,"Rivals working together where interests align."],
+     ["Tesla offers its patents to competitors",4,"Growing the EV market and spreading its technology."],
+     ["P&G wages long share wars in diapers to build a reputation for toughness",3,"Reputation that protects its other markets."],
+     ["The Mafia threatens reprisals so suspects keep silent",1,"Changes the payoffs in the prisoners' dilemma."],
+     ["Exxon and Shell run joint ventures while competing for leadership",0,"Co-opetition."]
+    ]},
+  aud:[
+   ["In the Coca-Cola vs Pepsi advertising game, the Nash equilibrium is:",["Both choose big budgets","Both choose small budgets","One big, one small","There is no equilibrium"],"Each fears the other going big, so both do. Neither can gain by changing alone."],
+   ["For a deterrent threat to work, it must above all be:",["Credible","Secret","Made by the largest firm","Announced publicly"],"If carrying it out would hurt the threatener more, rivals will not believe it."],
+   ["Cortés destroying his ships is an example of:",["Commitment","Signaling through misinformation","Cooperation","Changing the structure of the game"],"Commitment binds a player to a course of action by removing alternatives."],
+   ["Which is NOT part of Porter's competitor analysis framework?",["The competitor's share price volatility","Its current strategy","Its objectives","Its assumptions about the industry"],"The fourth element is its resources and capabilities."],
+   ["Barriers that protect one segment from firms in other segments of the same industry are called:",["Mobility barriers","Entry barriers","Exit barriers","Switching costs"],"Entry barriers protect the whole industry; mobility barriers protect segments or groups."],
+   ["Strategic group analysis is most useful for:",["Understanding strategic positioning and patterns of competition","Predicting large, lasting profit differences between groups","Measuring industry concentration","Identifying collusion"],"Research finds limited evidence of systematic profit differences between groups."],
+   ["Studies of interfirm profit differences find that industry factors explain:",["Less than 20% of the variation","About half","About 80%","None of it"],"Differences within industries are larger than those between industries."],
+   ["According to Jacobides, a firm captures more value in its ecosystem by:",["Controlling a bottleneck and becoming irreplaceable","Supplying a small, easily substituted component","Avoiding contact with end customers","Spreading into every activity equally"],"System integrators and guardians of quality tend to win the value battle."]
+  ],
+  heist:[
+   ["Co-opetition refers to:",["Business relationships that combine competition and cooperation","A merger of rivals","Price-fixing","Ignoring competitors"],"Brandenburger and Nalebuff: no relationship is purely competitive or purely cooperative."],
+   ["Why is threatening a price war often a weak deterrent to entry?",["It would damage the incumbent more than the entrant, so it lacks credibility","Price wars are illegal","Entrants never consider incumbents","It is too cheap to carry out"],"Investing in excess capacity is usually a more credible deterrent."],
+   ["In the value capture model, the upper limit on value a firm can capture is:",["The value it adds to its current network","Its market capitalization","Its revenue","The value it could add to another network"],"The value it could add elsewhere is the lower limit."],
+   ["A key limitation of game theory in strategy is that:",["Realistic models often give no equilibrium or many, and results are sensitive to assumptions","It cannot handle cooperation","It ignores rivals' decisions","It works only for monopolies"],"It is better at explaining past competitive situations than predicting new ones."],
+   ["Harley-Davidson's 1966 dismissal of lightweight Japanese bikes illustrates:",["Blindspots created by industry recipes about competitors' assumptions","A signaling strategy","Mobility barriers","Hypercompetition"],"Shared beliefs about the industry kept incumbents from seeing the threat."],
+   ["Which statement is true?",["The purpose of segmentation analysis is to find attractive segments, select strategies for them and decide how many to serve","Firms must compete in many segments to gain advantage","A strategic group is the set of firms in one segment","Firms in a strategic group engage in tacit collusion"],"Segment scope depends on whether KSFs are similar and costs can be shared."],
+   ["A 'hard' commitment is one that:",["Commits a firm to aggressive competition","Signals a desire to avoid competition, such as announced profit targets","Can be reversed at no cost","Is kept secret from rivals"],"Soft commitments moderate competition; hard ones make aggression credible."]
+  ]},
+{ id:"q", ini:"QM", crew:"The Quartermaster", src:"Collis & Montgomery, Competing on Resources", role:"Picks the gear that won't break under pressure.",
+  room:"The vault door", roomLine:"You're at the vault. Only the right gear gets you in, and keeps what's inside yours.",
+  brief:[
+   ["Bridging outside and inside","<p>Strategy swung from <b>industry analysis</b> (Porter's five forces: choose the right industry) to <b>core competence</b> and capabilities (look inside). The <b>resource-based view</b> (RBV) combines both.</p><p>Resources come in three forms: <b>physical</b> (the cable wire into your house), <b>intangible</b> (Disney's brand, Sharp's LCD know-how) and <b>organizational capabilities</b> embedded in routines, processes and culture (Japanese lean manufacturing).</p><p>A resource's value is set by the interplay of three market forces: <b>demand</b>, <b>scarcity</b> and <b>appropriability</b>. The value creation zone is where all three overlap.</p>","A brand that works for Disney fails for lobsters. Value is always relative to a market."],
+   ["Test 1: inimitability","<p>Is it hard to copy? Four sources:</p><ul><li><b>Physical uniqueness</b>: a prime location, mineral rights, Merck's patents. Rarer than managers think.</li><li><b>Path dependency</b>: built over time and hard to accelerate. Gerber's baby-food trust; research findings that cumulate.</li><li><b>Causal ambiguity</b>: rivals can't tell what the resource is or how to recreate it. Rubbermaid's innovation; Southwest's culture.</li><li><b>Economic deterrence</b>: a large, scale-sensitive, market-specific investment rivals choose not to match. The first float-glass plant in a small market.</li></ul><p>IBP modernised meatpacking, then ConAgra and Cargill copied it and returns fell from 1.3% to 0.4%.</p>","Past quiz: Google's AI advantage from years of accumulated user data is path dependency."],
+   ["Test 2: durability","<p>How quickly does it depreciate? Disney's brand survived nearly two decades of neglect between Walt Disney's death and Eisner's arrival. Semiconductor memory know-how is a rapidly wasting asset; each generation had a new leader.</p><p>Schumpeter's waves of innovation make most advantages transitory. Banking on the durability of a core competence is risky.</p>",null],
+   ["Test 3: appropriability","<p>Who captures the value? Profits are bargained over by customers, distributors, suppliers and <b>employees</b>.</p><p>LBO firms' key resource was their network of deal relationships. It lived in <b>individuals</b>, who left to start their own funds. A resource not tied to the company makes profits hard to keep.</p>","A resource that 'resides in a consultant' or 'can walk out the door' fails this test."],
+   ["Test 4: substitutability","<p>Can a different resource trump it? People Express built a unique no-frills system the majors couldn't copy. They didn't need to: they used a <b>different resource</b>, computer reservation systems and yield management, to match its fares. People Express went bankrupt.</p><p>Steel lost the beer can market to aluminium.</p>",null],
+   ["Test 5: competitive superiority","<p>Whose resource is really better? Managers often treat core competence as a <b>feel-good exercise that no one fails</b>: the activity the firm does best internally. The right test is external, what it does <b>better than competitors</b>, for which <b>distinctive competence</b> is the better term.</p><p><b>Disaggregate</b>: 'consumer marketing' becomes brand management, then line extensions, couponing. A diagnostics maker found 'instrumentation' was really a superior <b>human interface</b>, so it hired ergonomists and moved into doctors' offices. Sometimes superiority lies in a combination (Honeywell's system integration).</p>",null],
+   ["Invest, upgrade, leverage","<ul><li><b>Invest</b>: all resources depreciate. Eisner put $50m into Roger Rabbit and quadrupled animation; Marks & Spencer renovated while Sears diversified. But check the industry: Masco's metalworking competence earned low returns in structurally poor industries.</li><li><b>Upgrade</b>: add resources (Intel added the Intel Inside brand), move to alternative resources, or climb to better industries (Nucor). Sharp's 'seeds and needs' built calculators, then chips, then LCDs. Cooper bought Champion to learn global manufacturing.</li><li><b>Leverage</b> into markets where resources give advantage. Specific resources are powerful but don't travel; fungible ones (cash) travel but rarely give advantage.</li></ul><p>Three diversification errors: overestimating <b>transferability</b> (M&S in North America), overestimating ability to vault <b>entry barriers</b> (Philip Morris and 7-Up), assuming <b>generic</b> resources win anywhere (Chrysler and Gulfstream).</p>",null],
+   ["Crossover terms from the quiz","<ul><li><b>Resource</b> is what the firm owns; <b>capability</b> is what it can do. In fast food, real estate is a resource and site-locating skill is a capability.</li><li><b>Distinctive competence</b>: an activity the firm does better than competitors.</li><li>Barney's VRIO: valuable and rare but <b>easy to imitate</b> gives a <b>temporary</b> advantage; valuable, rare and costly to imitate gives a sustained one.</li><li>The best strategies are often built on <b>intangible</b> resources.</li><li>The balance sheet does <b>not</b> show a firm's most valuable resources; brands and know-how are undervalued or missing.</li></ul>","These showed up in the 2023 quiz even though Grant's resource chapter isn't on your list."]
+  ],
+  job:{ title:"Test the gear", intro:"Each story shows a resource that failed or passed one of Collis and Montgomery's five tests. Name the test.",
+    bins:["Inimitability","Durability","Appropriability","Substitutability","Competitive superiority"],
+    items:[
+     ["ConAgra and Cargill replicated IBP's automated beef plants",0,"The advantage was copied, so returns fell."],
+     ["Semiconductor memory know-how lost value with every new generation",1,"A rapidly wasting asset."],
+     ["LBO deal networks left with the partners who built them",2,"The value lived in individuals, not the firm."],
+     ["Airlines used reservation systems to match People Express fares",3,"A different resource delivered the same result."],
+     ["Every packaged-goods firm claims consumer marketing as its core competence",4,"Being good at something isn't enough; it must beat rivals."],
+     ["Steel lost the beer can market to aluminium",3,"A substitute resource trumped the incumbent's."],
+     ["Disney's brand survived two decades of neglect",1,"A long-lasting resource."],
+     ["No rival can say exactly what makes Southwest's culture work",0,"Causal ambiguity blocks imitation."],
+     ["A diagnostics maker traced its edge to the human interface, not 'instrumentation'",4,"Disaggregation found the truly superior skill."],
+     ["Star traders capture most of the profits their skills generate",2,"Employees bargain away the rents."]
+    ]},
+  aud:[
+   ["Applying the inimitability, durability and appropriability tests, which resource is most valuable?",["A brand built over decades as the industry pioneer","A technology licensed from a foreign firm for three years","A star marketing head hired last month","A creative team working on contract"],"The brand is path dependent, long lasting and owned by the firm. The others expire or can walk out."],
+   ["Gerber's brand is hard to copy mainly because of:",["Path dependency","Physical uniqueness","Economic deterrence","Causal ambiguity"],"Consumer trust built over years cannot be bought instantly, even with huge advertising budgets."],
+   ["Rivals cannot pin down what makes Southwest's culture work, so they cannot copy it. This is:",["Causal ambiguity","Path dependency","Economic deterrence","Durability"],"Causally ambiguous resources are often capabilities embedded in social interactions."],
+   ["A firm builds the first float-glass plant in a small country and rivals choose not to follow. This is:",["Economic deterrence","Causal ambiguity","Appropriability","Substitutability"],"The market can support only one plant of efficient scale, and the investment signals commitment."],
+   ["The major airlines defeated People Express by using a different resource: reservation systems and yield management. Which test did People Express's resources fail?",["Substitutability","Inimitability","Durability","Appropriability"],"Its no-frills system was hard to copy but could be trumped by a different resource."],
+   ["Collis and Montgomery prefer 'distinctive competence' to 'core competence' because:",["A competence must be judged against competitors, not just against the firm's other activities","Core competence ignores customers","Distinctive competence is easier to measure","Core competence applies only to manufacturing"],"Core competence has too often become a feel-good exercise that no firm fails."],
+   ["Masco's experience with its metalworking competence teaches that:",["Investing in competences without analysing industry attractiveness can yield low returns","Metalworking is not a real capability","Diversification always fails","Resources matter more than industry structure"],"Masco entered industries with price-sensitive buyers, low entry barriers and powerful suppliers."],
+   ["Resources that generate a temporary competitive advantage are:",["Valuable and rare but not costly to imitate","Valuable, rare and costly to imitate","Valuable but neither rare nor costly to imitate","Not valuable but rare"],"Rivals soon copy them. Sustained advantage needs imitation to be costly too."]
+  ],
+  heist:[
+   ["Which property makes a resource LESS strategically valuable?",["It depreciates quickly","It is hard for rivals to copy","The firm captures most of the value it creates","It is superior to rivals' similar resources"],"Durability is one of the five tests."],
+   ["LBO firms struggled to keep profits from their deal networks because those networks:",["Resided in individuals who could leave","Were easily imitated by banks","Depreciated within months","Were substituted by online platforms"],"This is a failure of appropriability."],
+   ["Marks & Spencer's repeated failures in North America show that managers often:",["Overestimate how well context-specific resources transfer to new markets","Underinvest in their home market","Choose industries with low entry barriers","Rely too much on fungible resources"],"Path dependency and causal ambiguity make resources hard for the owner to replicate too."],
+   ["Highly fungible resources such as cash:",["Transfer easily across markets but rarely provide competitive advantage","Are the main source of competitive advantage","Cannot be moved across businesses","Are always path dependent"],"Specialized resources give advantage but lose value outside their setting."],
+   ["Intel adding the 'Intel Inside' brand to its technology base is an example of:",["Upgrading resources by adding a new one","Leveraging a fungible resource","Economic deterrence","Straddling"],"Other routes: moving to alternative resources or into more attractive industries."],
+   ["According to Collis and Montgomery, the value of a resource is determined by:",["The interplay of demand, scarcity and appropriability","Its book value","Its cost to acquire","Management's internal assessment"],"The five tests translate these market forces into practical checks."],
+   ["In the fast-food industry, site-locating skill and real estate are, respectively:",["A capability and a resource","A resource and a capability","A competence and a trade-off","An opportunity and a threat"],"Resources are what the firm owns; capabilities are what it can do with them."]
+  ]},
+{ id:"t", ini:"TK", crew:"The Timekeeper", src:"Ch 8 · Industry Evolution and Strategic Change", role:"Knows when to strike and when to leave.",
+  room:"The getaway", roomLine:"The industry is shifting under you. Adapt or get caught.",
+  brief:[
+   ["The industry life cycle","<p>Four phases: <b>introduction</b>, <b>growth</b>, <b>maturity</b>, <b>decline</b>, tracing an S-shaped sales curve. Two drivers: <b>demand growth</b> and the <b>creation and diffusion of knowledge</b>.</p><p>Life cycles vary: hotels are thousands of years old, MP3 players rose and fell in 20 years, and cycles are compressing online. Some industries <b>rejuvenate</b> (TVs: colour, flat-screen, HD; retailing waves). One industry can sit at different stages in different countries: cars are mature in the EU but growing in Asia.</p>",null],
+   ["Dominant designs","<p>In the introduction stage rival technologies compete. Convergence produces a <b>dominant design</b>: an overall product architecture the industry adopts, such as the Underwood Model 5 typewriter, Ford's Model T, or McDonald's fast-food format.</p><p>A <b>technical standard</b> is different: a technology that ensures <b>compatibility</b>, arising from network effects and usually owned as intellectual property (Wintel). A firm that sets a dominant design usually owns no IP in it, so profit isn't guaranteed.</p><p>After the dominant design, emphasis shifts from <b>product innovation to process innovation</b>: Ford's moving assembly line cut the Model T price from $628 to $260.</p>",null],
+   ["How each stage looks","<ul><li><b>Introduction</b>: early adopters, competing technologies, poor quality, few firms. KSF: product innovation, a credible image.</li><li><b>Growth</b>: rapid penetration, capacity shortages, entry. KSF: design for manufacture, distribution, brand, process innovation, <b>scaling up</b>.</li><li><b>Maturity</b>: replacement demand, knowledgeable price-sensitive buyers, commoditization, <b>shakeout</b>, production shifts to newly industrializing and then developing countries. KSF: <b>cost efficiency</b>.</li><li><b>Decline</b>: chronic overcapacity, price wars, exit. KSF: low overheads, buyer selection, signaling commitment, rationalizing capacity.</li></ul><p>R&D, capital investment and marketing intensity peak in growth and fall in maturity.</p>",null],
+   ["Who survives","<p><b>Organizational ecology</b> studies populations of firms. Numbers rise fast as an industry gains legitimacy, then a <b>shakeout</b> at maturity: US tyre makers went from 1 in 1896 to 274 in 1922 to 49 in 1936.</p><p><b>Resource partitioning</b>: as giants consolidate (AB InBev, Heineken), niches open for specialists (craft brewers).</p><p><b>De novo</b> entrants are start-ups; <b>de alio</b> entrants diversify from related industries. De alio firms win when capabilities carry over: radio makers dominated TV. Innovators and consolidators are often different firms; start-ups must 'cross the chasm' to mainstream buyers.</p>",null],
+   ["Why firms can't change","<ul><li><b>Organizational routines</b>: competency traps; core capabilities become <b>core rigidities</b></li><li><b>Social and political structures</b>: change threatens relationships and power</li><li><b>Conformity</b>: <b>institutional isomorphism</b>, imitating peers for legitimacy</li><li><b>Limited search</b>: <b>bounded rationality</b> and <b>satisficing</b>; exploitation crowds out exploration</li><li><b>Complementarities</b> among strategy, structure and systems: Liz Claiborne's tight system broke when reordering was allowed</li></ul><p>Result: <b>punctuated equilibrium</b>, long stability followed by radical, comprehensive change. Industry change mostly happens through firms dying and being born, not adapting.</p>",null],
+   ["Technology that topples leaders","<ul><li><b>Competence-enhancing vs competence-destroying</b> (Tushman and Anderson): the turbofan strengthened jet engine makers; the quartz watch destroyed mechanical watchmakers' skills.</li><li><b>Component vs architectural</b> (Henderson and Clark): a hybrid engine is a component change; a battery-electric car changes the whole architecture. Boeing rose by redesigning the plane around the jet engine.</li><li><b>Sustaining vs disruptive</b> (Christensen): disruptive technology first underperforms on what mainstream customers value, grows in niches, then displaces incumbents. Steamships on inland waters; the 3.5-inch disk drive rejected by Seagate's customers.</li></ul>",null],
+   ["Managing change","<ul><li><b>Dual strategies</b> (Abell) and <b>ambidexterity</b> (O'Reilly and Tushman). <b>Structural</b>: separate units for exploration (IBM built its PC in Florida; Shell GameChanger). <b>Contextual</b>: the same people explore and exploit (Oticon, Whirlpool).</li><li><b>Creating perceptions of crisis</b>: Welch at GE; Grove's 'only the paranoid survive'</li><li><b>Stretch targets</b> and BHAGs (Jobs and the iPod)</li><li><b>Corporate-wide initiatives</b> and symbolic acts (Haier's CEO smashing faulty fridges)</li><li><b>Reorganizing structure</b></li><li><b>New leadership</b>: an outside CEO helps most when the firm is performing poorly</li><li><b>Scenario analysis</b>: Shell's Mountains and Oceans. Not forecasts; the value is in the process of surfacing assumptions and testing strategies.</li></ul>",null],
+   ["Building new capabilities","<p>Capabilities are <b>path dependent</b>, shaped by a firm's early history: Walmart's logistics from small-town stores, Toyota's lean production from post-war scarcity.</p><p>Build them <b>sequentially</b> through <b>product sequencing</b>: Hyundai moved from assembling a Ford Cortina to its own designs in compressed phases; Panasonic went from batteries to radios to TVs.</p><p><b>Dynamic capabilities</b> (Teece) are higher-order: sensing opportunities, seizing them, and reconfiguring assets. <b>Knowledge management</b>: <b>explicit</b> knowledge ('knowing about') spreads cheaply like a public good; <b>tacit</b> knowledge ('know-how') shows only in use. Nonaka's conversion spiral; the <b>paradox of replication</b>: making know-how explicit lets you scale it and lets rivals copy it.</p>",null]
+  ],
+  job:{ title:"Time the job", intro:"Place each observation at its stage of the industry life cycle.",
+    bins:["Introduction","Growth","Maturity","Decline"],
+    items:[
+     ["Rival technologies compete; no dominant design yet",0,"Competition is between designs, not firms."],
+     ["Customers are affluent, tech-savvy early adopters",0,"The market hasn't reached the mainstream."],
+     ["Capacity shortages and rapid process innovation",1,"Demand outstrips capacity after a dominant design."],
+     ["Scaling up production and winning distribution is the key challenge",1,"Growth-stage KSFs."],
+     ["A shakeout: failure rates rise and firms exit",2,"Typical at the onset of maturity."],
+     ["Products commoditize and price competition intensifies",2,"Knowledgeable buyers and standard products."],
+     ["Production moves to newly industrializing countries",2,"Deskilled processes migrate to low-cost locations."],
+     ["Chronic overcapacity and destructive price wars",3,"Demand is falling toward obsolescence."],
+     ["KSFs are low overheads, buyer selection and rationalizing capacity",3,"Decline-stage priorities."]
+    ]},
+  aud:[
+   ["Once a dominant design emerges, industries typically see:",["A shift from product innovation to process innovation","Faster radical product innovation","An end to all new entry","Immediate decline"],"Greater certainty about the design lets firms focus on efficiency and reliability."],
+   ["How does a technical standard differ from a dominant design?",["A standard ensures compatibility and usually embodies owned IP; a dominant design is an overall configuration usually not owned","A dominant design always carries patents; a standard never does","They are the same thing","A standard appears only in declining industries"],"Standards arise where network effects make users want compatibility."],
+   ["In the maturity stage, the key success factor tends to be:",["Cost efficiency through scale, low input costs and low overheads","Radical product innovation","Reaching early adopters","Building a credible image for a new product"],"Commoditization makes cost the main basis of advantage."],
+   ["Resource partitioning describes:",["Specialists entering niches as an industry consolidates around a few giants","Firms dividing resources among divisions","Governments allocating spectrum","The split between tangible and intangible resources"],"Craft brewers growing as global brewers consolidated is Grant's example."],
+   ["Institutional isomorphism causes inertia because firms:",["Imitate peers to gain legitimacy, locking in similar strategies and structures","Protect their political power","Stop searching once results are satisfactory","Have routines that are hard to change"],"The other options describe political structures, satisficing and routines."],
+   ["For Swiss mechanical watchmakers, the quartz watch was:",["Competence-destroying","Competence-enhancing","A sustaining innovation","A component innovation only"],"It made their precision-engineering capabilities largely irrelevant."],
+   ["Structural ambidexterity means:",["Creating separate units for exploration apart from core operations","The same people explore and exploit","Alternating between centralization and decentralization","Merging all R&D into one department"],"IBM developing its PC in Florida, far from headquarters, is the classic example."],
+   ["The main value of Shell's scenario analysis is:",["Surfacing assumptions and testing strategies against different possible futures","Forecasting the oil price precisely","Replacing strategic planning","Choosing the single most likely future"],"Shell insists its scenarios are not forecasts."]
+  ],
+  heist:[
+   ["A disruptive technology, in Christensen's sense:",["Initially underperforms on attributes mainstream customers value, then improves and displaces incumbents","Improves the performance attributes existing customers value","Is always adopted first by the industry leader","Only affects component suppliers"],"Leading customers resist it at first, which is why incumbents miss it."],
+   ["Architectural innovations are especially hard for incumbents because they:",["Require reconfiguring how components link together, i.e. the whole system","Involve only one new component","Are always patented by rivals","Occur only in service industries"],"Boeing gained leadership by redesigning aircraft around the jet engine."],
+   ["Punctuated equilibrium describes organizations that:",["Stay stable for long periods, then undergo radical, comprehensive change","Change a little every year","Never change","Change only through acquisitions"],"Complementarities make piecemeal change hard, so misfit builds until a crisis forces change."],
+   ["Dynamic capabilities are:",["Higher-order capabilities to sense, seize and reconfigure resources and competences","The fastest operational routines","Capabilities that depreciate quickly","Resources bought on the market"],"Teece: the ability to integrate, build and reconfigure competences for changing environments."],
+   ["Tacit knowledge is:",["Know-how revealed through performance and transferred mainly by practice","Facts and instructions that can be written down","Easily copied by rivals","Protected mainly by patents"],"Explicit knowledge behaves like a public good; tacit knowledge doesn't."],
+   ["A shakeout typically occurs:",["At the onset of maturity","During introduction","At the peak of growth","Only in decline"],"Failure rates jump and the number of firms falls sharply."],
+   ["An outside CEO is most likely to lead change more effectively than an insider when:",["The organization is performing poorly","The firm is highly profitable","The industry is stable","The firm is newly founded"],"Grant cites evidence that outsiders help most in poor-performance situations."]
+  ]}
+];
+
+/* =================================================================
+   GAME DATA ADDITIONS
+   ================================================================= */
+const ORDER = ["s","m","i","b","q","t"];      /* heist route */
+const PER_ROOM = 4, QTIME = 60, MAX_HEAT = 5;
+const EXTRA = {
+ m:{ lvl:"Rooftop tryout", term:"Signal box", theme:"roof", haz:["pit","spikes","pit2","moving"], col:"#E8B04F", hat:"#1F2B45", coat:"#3B4A6B",
+     prize:"Blueprint", pic:"BP", perk:"Forgives two wrong answers in the heist.",
+     ask:["Boss, why do some people win big? Is it talent or money?","How do you picture a strategy? What does it connect?","What's the difference between strategy and tactics? And 'where' versus 'how'?","Why bother with a strategy? We could just react as we go.","Do plans ever go the way they're written?","We're already faster and cheaper than everyone. Isn't that strategy?","So how do we pick a position that's really ours?","What stops someone copying our position?"] },
+ b:{ lvl:"Safe-cracking test", term:"Safe", theme:"bank", haz:["spikes","moving","pit","spikes"], col:"#6FD39A", hat:"#3A2A18", coat:"#5A4630",
+     prize:"Stethoscope", pic:"ST", perk:"Three 50/50 tips on heist questions.",
+     ask:["Isn't value just the profit we make?","Whose value are we chasing, the owners' or everyone's?","Profit is profit. Why do you keep saying 'which profit'?","How do we put one number on what the whole firm is worth?","How do I tell whether a firm is doing well, and why?","How should I set targets for the crew?","Do values and CSR have anything to do with profit?","Why pay for small bets that might never pay off?"] },
+ s:{ lvl:"Laser grid", term:"Laser console", theme:"lab", haz:["laser","laser","pit","laser"], col:"#F0604A", hat:"#101828", coat:"#2A3556",
+     prize:"Smoke canister", pic:"SM", perk:"Lasers stay on for a shorter time.",
+     ask:["Where do I even start when I case an industry?","What exactly are the five forces?","What keeps newcomers out of a juicy market?","When does competition between existing players get ugly?","How do I know who holds power, buyers or suppliers?","What about products that go together, like printers and ink?","OK, I've done the analysis. What do I do with it?","How do I decide where an industry's walls are? And what wins inside them?"] },
+ i:{ lvl:"Guard shift", term:"Keycard reader", theme:"ware", haz:["guard","guard","pit","guard"], col:"#8FC8EC", hat:"#223018", coat:"#3E4F33",
+     prize:"Guard's jacket", pic:"GJ", perk:"Guard torch beams are half as long.",
+     ask:["If industry explains everything, why do firms in the same industry differ so much?","Who else is in the picture besides rivals, buyers and suppliers?","How much of the pie can we actually capture?","Why do rivals end up hurting each other on purpose?","How can we change how the guards play?","How do I predict what a rival will do next?","How do I split a market into pieces worth attacking?","Aren't firms with similar strategies basically one gang?"] },
+ q:{ lvl:"Camera sweep", term:"Camera terminal", theme:"vault", haz:["camera","camera","spikes","camera"], col:"#C79BF2", hat:"#2A2540", coat:"#453C66",
+     prize:"Grapple boots", pic:"GB", perk:"Double jump for the whole heist.",
+     ask:["What counts as a resource, and what makes one valuable?","How do I know if a resource can be copied?","Does a great resource last forever?","If we own the resource, don't we keep all the profit?","What if a rival beats our resource with a different one?","Everyone says they're good at marketing. How do I know we really are?","So what do we do with our resources?","Any terms the examiners like to trip people on?"] },
+ t:{ lvl:"Collapsing tunnel", term:"Pressure switch", theme:"tunnel", haz:["crumble","moving","crumble","pit2"], col:"#F29A6B", hat:"#3A2014", coat:"#5E3A26",
+     prize:"Stopwatch", pic:"SW", perk:"+20 seconds per heist question, and floors crumble slower.",
+     ask:["Do industries age like people?","How does an industry settle on one way of doing things?","What changes from stage to stage?","Who survives as the industry matures?","Why can't big firms just change when they need to?","Which kinds of new technology topple leaders?","How do leaders force change anyway?","How does a firm build capabilities it doesn't have?"] }
+};
+const TH = {
+ hub:   {top:"#1c1628",bot:"#2d2339",blk:"#382d47",edge:"#9a82bd",deco:"#2a2136",ceil:true,name:"Hideout"},
+ roof:  {top:"#07122a",bot:"#27406b",blk:"#26324a",edge:"#6c8fbf",deco:"#121c33",ceil:false,name:"Rooftops"},
+ bank:  {top:"#1a130d",bot:"#35271a",blk:"#3e3023",edge:"#c49550",deco:"#2a1f15",ceil:true,name:"Bank basement"},
+ lab:   {top:"#070b19",bot:"#131d3b",blk:"#1c2544",edge:"#4f78cf",deco:"#10182f",ceil:true,name:"Laser lab"},
+ ware:  {top:"#0d120d",bot:"#1c2619",blk:"#2b3526",edge:"#7a9064",deco:"#161e14",ceil:true,name:"Warehouse"},
+ vault: {top:"#101118",bot:"#20232e",blk:"#2e3343",edge:"#95a0b8",deco:"#191b24",ceil:true,name:"Vault level"},
+ tunnel:{top:"#150d09",bot:"#2d1c13",blk:"#3f2c20",edge:"#a8744b",deco:"#22150e",ceil:true,name:"Service tunnel"}
+};
+
+/* =================================================================
+   STATE / SAVE
+   ================================================================= */
+const KEY = "operation-moat-v2";
+let S = { stars:{}, hired:{}, best:null };
+try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const byId = id => CREW.find(c=>c.id===id);
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function prep(item, tag){ const [q,opts,e]=item; return { q, e, tag, opts: shuffle(opts.map((t,i)=>({t,c:i===0}))) }; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function starsHtml(n){ return '<span class="stars" aria-label="'+n+' of 3 stars">'+[0,1,2].map(i=>'<i class="'+(i<n?'on':'')+'"></i>').join('')+'</span>'; }
+function starsFor(score,total){ const r=score/total; return r>=0.85?3:r>=0.6?2:r>=0.35?1:0; }
+const hasPrize = id => !!S.hired[id];
+
+/* =================================================================
+   ENGINE: constants, canvas, input
+   ================================================================= */
+const T = 32, VW = 960, VH = 544, FL = 14;           /* floor top row */
+const GRAV = 1900, JUMP = 640, SPEED = 235;
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const K = { l:false, r:false, j:false, e:false }, KP = { j:false, e:false };
+function setKey(k,down){ if(down && !K[k] && (k==="j"||k==="e")) KP[k]=true; K[k]=down; }
+const KEYMAP = { ArrowLeft:"l", a:"l", A:"l", ArrowRight:"r", d:"r", D:"r", " ":"j", ArrowUp:"j", w:"j", W:"j", e:"e", E:"e", Enter:"e", ArrowDown:"e", s:"e", S:"e" };
+window.addEventListener("keydown", ev=>{
+  if(!ovEl.hidden){ overlayKey(ev); return; }
+  const k = KEYMAP[ev.key]; if(k){ setKey(k,true); ev.preventDefault(); }
+});
+window.addEventListener("keyup", ev=>{ const k = KEYMAP[ev.key]; if(k) setKey(k,false); });
+window.addEventListener("blur", ()=>{ for(const k in K) K[k]=false; });
+document.querySelectorAll(".pad button").forEach(b=>{
+  const k=b.dataset.k;
+  b.addEventListener("pointerdown", e=>{ e.preventDefault(); b.setPointerCapture && b.setPointerCapture(e.pointerId); setKey(k,true); });
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>b.addEventListener(t, ()=>setKey(k,false)));
+});
+
+/* =================================================================
+   LEVELS
+   ================================================================= */
+let L = null;          /* current level */
+let P = null;          /* player */
+let G = null;          /* game-mode state (interview or heist) */
+let paused = true, time = 0, camX = 0, flash = 0, toast = null;
+
+function newLevel(W){
+  const g = Array.from({length:17}, ()=>Array(W).fill("."));
+  return { g, w:W, h:17, ents:[], ranges:[], crumb:{}, terms:[], spawn:{x:2*T, y:FL*T-30} };
+}
+function themeAt(x){ if(!L) return TH.hub; for(const r of L.ranges) if(x>=r.x0*T && x<r.x1*T) return TH[r.th]; return TH[L.ranges.length?L.ranges[L.ranges.length-1].th:"hub"]; }
+
+function buildRun(spec){
+  /* spec: [{id, qs:[Q...], label}] rooms in order. Returns level. */
+  const L2 = newLevel(40 + spec.reduce((a,r)=>a+r.qs.length*23+10, 0));
+  const g = L2.g; let x = 0;
+  const col = (c, th, ceil)=>{ for(let y=FL;y<17;y++) g[y][c]="X"; if(ceil) g[0][c]="X"; };
+  const theme = th => TH[th];
+  let curTh = EXTRA[spec[0].id].theme;
+  const flat = n => { const ce=theme(curTh).ceil; for(let i=0;i<n;i++) col(x+i,curTh,ce); x+=n; };
+  for(let y=0;y<17;y++) g[y][0]="X";           /* left wall */
+  flat(7);
+  spec.forEach((room, ri)=>{
+    const ex = EXTRA[room.id]; curTh = ex.theme;
+    const r0 = ri===0?0:x;
+    if(spec.length>1){ flat(3); L2.ents.push({type:"sign", x:(x-2)*T, y:FL*T-110, text:byId(room.id).room, sub:"Room "+(ri+1)+" of "+spec.length}); flat(2); }
+    room.qs.forEach((Q, qi)=>{
+      const hz = ex.haz[qi % ex.haz.length];
+      x += segment(L2, hz, x, curTh, qi);
+      /* terminal zone */
+      flat(6);
+      const tx = (x-4)*T+2;
+      const term = {type:"term", x:tx, y:FL*T-46, w:30, h:46, q:Q, done:false, label:ex.term, crew:room.id, style:room.id==="b"?"safe":"kiosk"};
+      const gate = {type:"gate", x:(x-2)*T+8, y:0, w:16, h:FL*T, open:false, solid:true, term};
+      term.gate = gate;
+      L2.ents.push(term, gate); L2.terms.push(term);
+    });
+    L2.ranges.push({x0:r0, x1:x, th:curTh});
+  });
+  flat(10);
+  L2.ents.push({type:"exit", x:(x-6)*T, y:FL*T-72, w:48, h:72});
+  for(let y=0;y<17;y++){ g[y][x]="X"; g[y][x+1]="X"; }
+  L2.w = x+2; L2.g = g.map(row=>row.slice(0,L2.w));
+  L2.ranges[L2.ranges.length-1].x1 = L2.w;
+  return L2;
+}
+
+function segment(L2, kind, x0, th, n){
+  const g = L2.g, ce = TH[th].ceil, E = L2.ents;
+  const colF = (c)=>{ for(let y=FL;y<17;y++) g[y][c]="X"; if(ce) g[0][c]="X"; };
+  const carve = (a,b)=>{ for(let c=a;c<=b;c++) for(let y=FL;y<17;y++) g[y][c]="."; };
+  const coins = (cx, cy, k)=>{ for(let i=0;i<k;i++) E.push({type:"coin", x:(cx+i)*T+10, y:cy*T+8, w:12, h:14, got:false}); };
+  let w = 12;
+  if(kind==="pit"){ w=11; for(let i=0;i<w;i++) colF(x0+i); carve(x0+4,x0+6); coins(x0+4,11,3); }
+  else if(kind==="pit2"){ w=14; for(let i=0;i<w;i++) colF(x0+i); carve(x0+3,x0+5); carve(x0+8,x0+10); coins(x0+6,11,2); }
+  else if(kind==="spikes"){ w=13; for(let i=0;i<w;i++) colF(x0+i); for(let c=x0+3;c<=x0+5;c++) g[FL-1][c]="S"; g[FL-1][x0+6]="X"; g[FL-2][x0+6]="X"; g[FL-1][x0+7]="X"; g[FL-2][x0+7]="X"; for(let c=x0+8;c<=x0+10;c++) g[FL-1][c]="S"; coins(x0+6,10,2); }
+  else if(kind==="moving"){ w=14; for(let i=0;i<w;i++) colF(x0+i); carve(x0+3,x0+11);
+    E.push({type:"mover", x:(x0+3)*T, y:FL*T, w:3*T, h:14, a:(x0+3)*T, b:(x0+9)*T, dir:1, sp:80, solid:true, dx:0}); coins(x0+5,10,3); }
+  else if(kind==="laser"){ w=16; for(let i=0;i<w;i++) colF(x0+i);
+    [4,8,12].forEach((c,i)=>E.push({type:"laser", x:(x0+c)*T+16, y1:ce?T:0, y2:FL*T, per:2.4, on:.46, ph:i*0.8+n*0.3})); coins(x0+6,12,4); }
+  else if(kind==="guard"){ w=16; for(let i=0;i<w;i++) colF(x0+i); g[FL-2][x0+4]="X"; g[FL-1][x0+4]="X"; for(let c=x0+5;c<=x0+10;c++) g[11][c]="X";
+    E.push({type:"guard", x:(x0+12)*T, y:FL*T-40, w:22, h:40, a:(x0+6)*T, b:(x0+13)*T, dir:-1, sp:58, wait:0}); coins(x0+6,10,4); }
+  else if(kind==="camera"){ w=17; for(let i=0;i<w;i++) colF(x0+i); for(const c of [x0+4,x0+5,x0+11,x0+12]){ g[FL-1][c]="X"; g[FL-2][c]="X"; }
+    E.push({type:"cam", x:(x0+8)*T+16, y:(ce?T:0)+10, mid:Math.PI/2, amp:0.62, per:4.2, ph:n*1.3, range:470, half:0.2, det:0}); coins(x0+6,12,4); }
+  else if(kind==="crumble"){ w=15; for(let i=0;i<w;i++) colF(x0+i); carve(x0+2,x0+12); for(let c=x0+2;c<=x0+12;c++) g[FL][c]="C"; coins(x0+4,11,5); }
+  return w;
+}
+
+function buildHub(){
+  const W = 48, L2 = newLevel(W), g = L2.g;
+  for(let c=0;c<W;c++){ for(let y=FL;y<17;y++) g[y][c]="X"; g[0][c]="X"; }
+  for(let y=0;y<17;y++){ g[y][0]="X"; g[y][W-1]="X"; }
+  /* small stage for the vault door */
+  L2.ranges.push({x0:0,x1:W,th:"hub"});
+  L2.ents.push({type:"board", x:14*T, y:3*T, w:12*T, h:5*T});
+  L2.ents.push({type:"table", x:17*T, y:FL*T-34, w:6*T, h:34});
+  CREW.forEach((c,i)=>L2.ents.push({type:"npc", id:c.id, x:[4,8,12,28,32,36][i]*T, y:FL*T-34, w:22, h:34, face:1, bob:Math.random()*6}));
+  L2.ents.push({type:"vault", x:42*T, y:FL*T-120, w:4*T, h:120});
+  L2.spawn = {x:22*T, y:FL*T-30};
+  return L2;
+}
+
+/* =================================================================
+   PLAYER + PHYSICS
+   ================================================================= */
+function spawnPlayer(x,y){ P = {x, y, w:20, h:30, vx:0, vy:0, on:false, face:1, coy:0, buf:0, jumps:0, dead:0, anim:0, ride:null, cx:x, cy:y}; }
+function tileAt(tx,ty){ if(tx<0||tx>=L.w) return "X"; if(ty<0||ty>=L.h) return "."; return L.g[ty][tx]; }
+function solidTile(tx,ty){ const c = tileAt(tx,ty); if(c==="X") return true; if(c==="C"){ const s=L.crumb[ty*L.w+tx]; return !(s && s.fallen); } return false; }
+function solidPt(px,py){ return solidTile(Math.floor(px/T), Math.floor(py/T)); }
+function solids(){ return L.ents.filter(e=>e.solid && !(e.type==="gate" && e.open)); }
+function overlap(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
+
+function stepPlayer(dt){
+  if(P.dead>0){ P.dead-=dt; if(P.dead<=0){ P.x=P.cx; P.y=P.cy; P.vx=0; P.vy=0; } return; }
+  const dir = (K.r?1:0) - (K.l?1:0);
+  P.vx = dir*SPEED; if(dir) P.face = dir;
+  if(KP.j) P.buf = 0.12; else P.buf = Math.max(0, P.buf-dt);
+  P.coy = P.on ? 0.1 : Math.max(0, P.coy-dt);
+  const dbl = G && G.mode==="heist" && hasPrize("q");
+  if(P.buf>0){
+    if(P.on || P.coy>0){ P.vy = -JUMP; P.on=false; P.coy=0; P.buf=0; P.jumps=1; P.ride=null; }
+    else if(dbl && P.jumps<2){ P.vy = -JUMP*0.9; P.jumps=2; P.buf=0; }
+  }
+  if(!K.j && P.vy < -220) P.vy = -220;           /* variable jump height */
+  P.vy = Math.min(P.vy + GRAV*dt, 900);
+  /* ride moving platform */
+  if(P.ride && P.on){ P.x += P.ride.dx; }
+  /* X */
+  const ox = P.x; P.x += P.vx*dt;
+  const top=P.y+2, mid=P.y+P.h/2, bot=P.y+P.h-2;
+  if(P.vx>0){ const r=P.x+P.w; if(solidPt(r,top)||solidPt(r,mid)||solidPt(r,bot)) P.x = Math.floor(r/T)*T - P.w - 0.01; }
+  else if(P.vx<0){ const l=P.x; if(solidPt(l,top)||solidPt(l,mid)||solidPt(l,bot)) P.x = Math.floor(l/T)*T + T + 0.01; }
+  for(const e of solids()) if(overlap(P,e) && e.type!=="mover"){ P.x = (ox+P.w/2 < e.x+e.w/2) ? e.x-P.w-0.01 : e.x+e.w+0.01; }
+  /* Y */
+  const oy = P.y; P.y += P.vy*dt; P.on=false; P.ride=null;
+  const lx=P.x+3, rx=P.x+P.w-3;
+  if(P.vy>=0){ const b=P.y+P.h; if(solidPt(lx,b)||solidPt(rx,b)){ P.y=Math.floor(b/T)*T-P.h; P.vy=0; P.on=true; P.jumps=0; } }
+  else { const t=P.y; if(solidPt(lx,t)||solidPt(rx,t)){ P.y=Math.floor(t/T)*T+T+0.01; P.vy=0; } }
+  for(const e of solids()){
+    if(!overlap(P,e)) continue;
+    if(oy+P.h <= e.y+6 && P.vy>=0){ P.y=e.y-P.h; P.vy=0; P.on=true; P.jumps=0; if(e.type==="mover") P.ride=e; }
+    else if(e.type==="mover" && oy >= e.y+e.h-6){ P.y=e.y+e.h; P.vy=0; }
+    else if(e.type!=="mover"){ P.x = (P.x+P.w/2 < e.x+e.w/2) ? e.x-P.w-0.01 : e.x+e.w+0.01; }
+  }
+  /* crumble trigger */
+  if(P.on){ for(const px of [lx,rx]){ const tx=Math.floor(px/T), ty=Math.floor((P.y+P.h+2)/T); if(tileAt(tx,ty)==="C"){ const k=ty*L.w+tx; if(!L.crumb[k]) L.crumb[k]={t: (G&&G.mode==="heist"&&hasPrize("t"))?0.9:0.5, fallen:false, rt:0}; } } }
+  P.anim += Math.abs(P.vx)*dt;
+  /* hazards */
+  if(P.y > L.h*T) return caught("You fell.");
+  for(const [px,py] of [[P.x+4,P.y+P.h-3],[P.x+P.w-4,P.y+P.h-3],[P.x+P.w/2,P.y+P.h/2]]){ if(tileAt(Math.floor(px/T),Math.floor(py/T))==="S" && (py%T) > 14) return caught("Spikes."); }
+}
+
+function caught(why){
+  if(P.dead>0) return;
+  P.dead = 0.75; flash = 0.5; G.busts++;
+  if(G.mode==="heist"){ G.heat++; say(why+" Heat +1."); if(G.heat>=MAX_HEAT) setTimeout(()=>endHeist(true), 700); }
+  else say(why+" Back to the last checkpoint.");
+}
+function say(t){ toast = {t, life:2.2}; }
+
+function stepEnts(dt){
+  const smoke = G && G.mode==="heist" && hasPrize("s");
+  const jacket = G && G.mode==="heist" && hasPrize("i");
+  for(const e of L.ents){
+    if(e.type==="mover"){ const ox=e.x; e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;} if(e.x<e.a){e.x=e.a;e.dir=1;} e.dx = e.x-ox; }
+    else if(e.type==="laser"){ const on = smoke ? e.on*0.62 : e.on; const ph=((time+e.ph)%e.per)/e.per; e.lit = ph<on; e.warn = !e.lit && ph>1-0.14;
+      if(e.lit && P.dead<=0 && P.x < e.x+4 && P.x+P.w > e.x-4 && P.y+P.h > e.y1 && P.y < e.y2) caught("Laser tripped."); }
+    else if(e.type==="guard"){
+      if(e.wait>0){ e.wait-=dt; if(e.wait<=0) e.dir*=-1; }
+      else { e.x += e.dir*e.sp*dt; if(e.x>e.b){ e.x=e.b; e.wait=1; } if(e.x<e.a){ e.x=e.a; e.wait=1; } }
+      const face = e.wait>0 ? e.dir : e.dir;
+      e.len = jacket ? 80 : 170;
+      e.ex = e.x + (face>0? e.w : 0); e.ey = e.y+10;
+      if(P.dead<=0){
+        if(overlap(P,e)) { caught("The guard grabbed you."); continue; }
+        const cx=P.x+P.w/2, cy=P.y+P.h/2;
+        const fx = e.ex + face*e.len, y1 = e.ey-22, y2 = FL*T;
+        const inX = face>0 ? (cx>e.ex && cx<fx) : (cx<e.ex && cx>fx);
+        if(inX){ const f = Math.abs(cx-e.ex)/e.len; const top = e.ey + (y1-e.ey)*f, botm = e.ey + (y2-e.ey)*f; if(cy>top && cy<botm) caught("Spotted by the guard."); }
+      }
+    }
+    else if(e.type==="cam"){
+      e.ang = e.mid + e.amp*Math.sin((time+e.ph)*2*Math.PI/e.per);
+      let seen=false;
+      if(P.dead<=0){
+        const cx=P.x+P.w/2, cy=P.y+P.h/2, dx=cx-e.x, dy=cy-e.y, d=Math.hypot(dx,dy);
+        if(d<e.range){ let a=Math.atan2(dy,dx)-e.ang; while(a>Math.PI)a-=2*Math.PI; while(a<-Math.PI)a+=2*Math.PI;
+          if(Math.abs(a)<e.half){ seen=true; const steps=Math.floor(d/8); for(let i=2;i<steps;i++){ const px=e.x+dx*i/steps, py=e.y+dy*i/steps; if(solidPt(px,py)){ seen=false; break; } } } }
+      }
+      e.det = seen ? e.det+dt : Math.max(0,e.det-dt*2);
+      if(e.det>0.6){ e.det=0; caught("The camera saw you."); }
+    }
+  }
+  for(const k in L.crumb){ const s=L.crumb[k];
+    if(!s.fallen){ s.t-=dt; if(s.t<=0){ s.fallen=true; s.rt=3; } }
+    else { s.rt-=dt; if(s.rt<=0){ const tx=k%L.w, ty=Math.floor(k/L.w); const r={x:tx*T,y:ty*T,w:T,h:T}; if(!overlap(P,r)) delete L.crumb[k]; } }
+  }
+}
+
+/* =================================================================
+   INTERACTION
+   ================================================================= */
+function near(e, pad){ return P.x+P.w > e.x-pad && P.x < e.x+e.w+pad && P.y+P.h > e.y-40 && P.y < e.y+e.h+20; }
+function interactTarget(){
+  if(!L || P.dead>0) return null;
+  for(const e of L.ents){
+    if(e.type==="term" && !e.done && near(e,18)) return e;
+    if(e.type==="npc" && near(e,26)) return e;
+    if(e.type==="vault" && near(e,10)) return e;
+  }
+  return null;
+}
+function stepInteract(){
+  const t = interactTarget();
+  if(KP.e && t){
+    if(t.type==="term") openQuestion(t);
+    else if(t.type==="npc") talk(t.id);
+    else if(t.type==="vault") heistIntro();
+  }
+  if(G && G.mode!=="hub"){
+    for(const e of L.ents){
+      if(e.type==="coin" && !e.got && overlap(P,e)){ e.got=true; G.loot+=100; }
+      if(e.type==="exit" && overlap(P,e) && P.dead<=0 && !G.over){ G.over=true; if(G.mode==="heist") endHeist(false); else endInterview(); }
+    }
+  }
+}
+
+/* =================================================================
+   MODES
+   ================================================================= */
+function enterHub(msg){
+  L = buildHub(); G = {mode:"hub", busts:0, loot:0};
+  spawnPlayer(L.spawn.x, L.spawn.y); camX = 0; paused=false; hideOv();
+  if(msg) say(msg);
+}
+function startInterview(id){
+  const c = byId(id);
+  L = buildRun([{id, qs:c.aud.map(q=>prep(q,id))}]);
+  G = {mode:"aud", id, busts:0, loot:0, correct:0, answered:0, log:[], over:false};
+  spawnPlayer(L.spawn.x, L.spawn.y); P.cx=P.x; P.cy=P.y; camX=0; paused=false; hideOv();
+  say(c.crew+": "+EXTRA[id].lvl+". Reach every "+EXTRA[id].term.toLowerCase()+" and answer it.");
+}
+function startHeist(){
+  const spec = ORDER.map(id=>({id, qs: shuffle(byId(id).heist).slice(0,PER_ROOM).map(q=>prep(q,id))}));
+  L = buildRun(spec);
+  G = {mode:"heist", busts:0, loot:0, correct:0, answered:0, log:[], heat:0, over:false,
+       covers: hasPrize("m")?2:0, tips: hasPrize("b")?3:0, qtime: QTIME + (hasPrize("t")?20:0)};
+  spawnPlayer(L.spawn.x, L.spawn.y); P.cx=P.x; P.cy=P.y; camX=0; paused=false; hideOv();
+  say("You're in. Six rooms, 24 locks. Keep the heat under five.");
+}
+
+/* =================================================================
+   OVERLAYS
+   ================================================================= */
+const ovEl = document.getElementById("ov"), ovc = document.getElementById("ovc");
+let OV = null, qTimer = null;
+function showOv(html, state){ ovc.innerHTML = html; ovEl.hidden=false; paused=true; for(const k in K) K[k]=false; OV = state||{}; const f=ovc.querySelector("[data-focus]")||ovc.querySelector(".btn.go")||ovc.querySelector("button"); if(f) f.focus({preventScroll:true}); ovc.scrollTop=0; }
+function hideOv(){ ovEl.hidden=true; ovc.innerHTML=""; OV=null; paused=false; stopQ(); }
+function stopQ(){ if(qTimer){ clearInterval(qTimer); qTimer=null; } }
+
+function titleScreen(){
+  const hired = CREW.filter(c=>S.hired[c.id]).length;
+  showOv(`<span class="label">Case file OM-11 · Competition &amp; Strategy</span>
+    <div class="big">Take the <em>moat</em>.</div>
+    <p style="font-size:17px;color:var(--muted);max-width:60ch">Rangmahal Industries has sat behind a wide moat for forty years. You're planning the job from a hideout. Six candidates want in. <b style="color:var(--ink)">Talk to each one and teach them their chapter, then watch them run their interview.</b> Every lock in an interview is an exam-style MCQ. Pass and they join the crew with a prize that changes the heist.</p>
+    <ul class="list">
+      <li><b>Walk</b> with arrows or A/D, <b>jump</b> with Space, <b>talk and use</b> with E.</li>
+      <li>Hazards send you back to the last checkpoint. Only answers decide stars: 5 of 8 right gets a candidate hired.</li>
+      <li>The heist mixes every obstacle and draws different questions. Wrong answers and getting caught raise the heat; five heat trips the alarm.</li>
+    </ul>
+    <p class="label">${hired} of 6 hired${S.best?` · best heist ${S.best.correct}/24`:''}</p>
+    <div class="btns"><button class="btn go" data-a="hub">${hired?'Back to the hideout':'Enter the hideout'}</button>${hired||S.best?'<button class="btn ghost" data-a="reset">Reset progress</button>':''}</div>`, {kind:"title"});
+}
+
+/* ---------- teaching conversation ---------- */
+function talk(id, k){
+  const c = byId(id), ex = EXTRA[id];
+  if(k===undefined && S.hired[id]){
+    showOv(`${whoHtml(c)}
+      <div class="bubble">Ready when you are, boss. I've got the ${esc(ex.prize.toLowerCase())} packed.</div>
+      <div class="prize"><span class="ic">${ex.pic}</span><div><b>${ex.prize}</b><p>${ex.perk}</p></div></div>
+      <p class="label">Best interview: ${starsHtml(S.stars[id]||0)}</p>
+      <div class="btns"><button class="btn" data-a="teach" data-id="${id}">Go over the lessons again</button><button class="btn" data-a="interview" data-id="${id}">Rerun the interview</button><button class="btn go" data-a="close">Back to planning</button></div>`, {kind:"talk"});
+    return;
+  }
+  k = k||0; const card = c.brief[k];
+  const last = k===c.brief.length-1;
+  showOv(`${whoHtml(c)}
+    <div class="meta"><span class="label">Lesson ${k+1} of ${c.brief.length} · ${esc(card[0])}</span><span class="dots">${c.brief.map((_,i)=>`<i class="${i<=k?'on':''}"></i>`).join("")}</span></div>
+    <div class="bubble">${esc(ex.ask[k])}</div>
+    <div class="you"><span class="tag">You explain</span>${card[1]}${card[2]?`<div class="said"><span class="who2">Exam tip</span>${card[2]}</div>`:''}</div>
+    ${last?`<div class="bubble">Got it. Put me through the ${esc(ex.lvl.toLowerCase())}. Every ${esc(ex.term.toLowerCase())} I reach, you quiz me.</div>`:''}
+    <div class="btns">
+      ${k>0?`<button class="btn" data-a="teach" data-id="${id}" data-k="${k-1}">Back</button>`:''}
+      ${last?`<button class="btn go" data-a="interview" data-id="${id}">Start the ${esc(ex.lvl.toLowerCase())}</button>`:`<button class="btn go" data-a="teach" data-id="${id}" data-k="${k+1}">Next</button>`}
+      ${!last?`<button class="btn ghost" data-a="interview" data-id="${id}">Skip to the interview</button>`:''}
+      <button class="btn ghost" data-a="close">Later</button>
+    </div>`, {kind:"talk"});
+}
+function whoHtml(c){ const ex=EXTRA[c.id]; return `<div class="who"><span class="ava" style="background:${ex.col}">${c.ini}</span><div><div class="n">${c.crew}</div><div class="s">${esc(c.src)}</div></div></div>`; }
+
+/* ---------- questions ---------- */
+function openQuestion(term){
+  const Q = term.q, heist = G.mode==="heist";
+  OV = null;
+  const st = {kind:"q", term, picked:null, left: heist?G.qtime:null};
+  renderQ(st);
+  if(heist){ qTimer = setInterval(()=>{ if(!OV || OV!==st || st.picked!==null) return; st.left--; const b=document.getElementById("qbar"), t=document.getElementById("qtxt"); if(b){ b.style.width=(st.left/G.qtime*100)+"%"; b.parentElement.classList.toggle("low", st.left<=15);} if(t) t.textContent=st.left+"s"; if(st.left<=0) answer(st,-1); }, 1000); }
+}
+function renderQ(st){
+  const term=st.term, Q=term.q, c=byId(term.crew), heist=G.mode==="heist";
+  const answered = st.picked!==null, ci = Q.opts.findIndex(o=>o.c);
+  const idx = L.terms.indexOf(term)+1;
+  const head = heist
+    ? `<div class="meta"><span class="label">${esc(c.room)} · ${esc(term.label)} · lock ${idx} of ${L.terms.length}</span><span class="label">Heat ${G.heat}/${MAX_HEAT}${G.covers?` · cover ${G.covers}`:''}</span></div>
+       ${!answered?`<div class="meta"><span class="label" id="qtxt">${st.left}s</span>${G.tips>0 && !Q.gone?`<button class="btn" data-a="tip" style="padding:5px 10px;font-size:13px">Use stethoscope 50/50 (${G.tips} left)</button>`:''}</div><div class="clock ${st.left<=15?'low':''}"><i id="qbar" style="width:${st.left/G.qtime*100}%"></i></div>`:''}`
+    : `<div class="meta"><span class="label">${esc(c.crew)}'s interview · ${esc(term.label)} ${idx} of ${L.terms.length}</span><span class="label">${G.correct} right so far</span></div>`;
+  const opts = Q.opts.map((o,i)=>{ let cls=""; if(answered){ if(o.c) cls="right"; else if(i===st.picked) cls="wrong"; } else if(Q.gone && Q.gone.includes(i)) cls="gone";
+    return `<button class="opt ${cls}" data-a="pick" data-i="${i}" ${answered||(Q.gone&&Q.gone.includes(i))?'disabled':''}><span class="k">${i+1}</span><span>${esc(o.t)}</span></button>`; }).join("");
+  let fb = "";
+  if(answered){
+    const ok = st.picked===ci;
+    fb = `<div class="explain ${ok?'good':'bad'}"><b>${st.picked===-1?'Out of time.':ok?'Correct.':'Not quite.'}</b> ${ok?'':'Answer: '+esc(Q.opts[ci].t)+'. '}${esc(Q.e)}${st.note?`<br><b>${esc(st.note)}</b>`:''}</div>
+      <div class="btns"><button class="btn go" data-a="qdone" data-focus>${term.style==="safe"?'Swing the door open':'Open the gate'}</button></div>`;
+  }
+  const icon = term.style==="safe" ? `<span class="label" style="color:var(--brass)">Crack the safe: the dial clicks on the right answer</span>` : "";
+  ovc.innerHTML = `${head}${icon}<p class="q-text">${esc(Q.q)}</p><div class="opts">${opts}</div>${fb}`;
+  ovEl.hidden=false; paused=true; for(const k in K) K[k]=false; OV=st;
+  const f = ovc.querySelector("[data-focus]") || ovc.querySelector(".opt:not([disabled])"); if(f) f.focus({preventScroll:true});
+}
+function answer(st, i){
+  if(st.picked!==null) return; stopQ();
+  st.picked = i; const Q=st.term.q, ok = i>=0 && Q.opts[i].c;
+  G.answered++;
+  if(ok) G.correct++;
+  else if(G.mode==="heist"){ if(G.covers>0){ G.covers--; st.note="Blueprint used: no heat for this miss."; } else { G.heat++; st.note="Heat +1."; } }
+  G.log.push({q:Q.q, tag:st.term.crew, ok, ans:Q.opts.find(o=>o.c).t, pick: i>=0?Q.opts[i].t:"(timed out)", e:Q.e});
+  renderQ(st);
+  if(!ok) flash = 0.35;
+}
+function closeQ(st){
+  const term = st.term; term.done = true; term.gate.open = true;
+  P.cx = term.gate.x+term.gate.w+14; P.cy = FL*T-P.h;
+  hideOv();
+  if(G.mode==="heist" && G.heat>=MAX_HEAT) endHeist(true);
+}
+function overlayKey(ev){
+  if(OV && OV.kind==="q" && OV.picked===null){ const m={"1":0,"2":1,"3":2,"4":3}; if(ev.key in m){ const b=ovc.querySelector(`.opt[data-i="${m[ev.key]}"]:not([disabled])`); if(b){ b.click(); ev.preventDefault(); } } }
+  if(ev.key==="Escape" && OV && (OV.kind==="talk")){ hideOv(); }
+}
+
+/* ---------- results ---------- */
+function endInterview(){
+  const id=G.id, c=byId(id), ex=EXTRA[id];
+  const n = starsFor(G.correct, L.terms.length), hired = n>=2;
+  const first = hired && !S.hired[id];
+  S.stars[id] = Math.max(S.stars[id]||0, n); if(hired) S.hired[id]=true; save();
+  const misses = G.log.filter(x=>!x.ok);
+  showOv(`${whoHtml(c)}
+    <span class="label">Interview result · ${esc(ex.lvl)}</span>
+    <div class="score">${G.correct}<small> / ${L.terms.length} right</small></div>
+    <div>${starsHtml(n)}</div>
+    ${hired?`<p style="font-size:17px">${first?'Selected. ':''}${c.crew} is on the crew${first?' and gets the prize':''}.</p>
+      <div class="prize"><span class="ic">${ex.pic}</span><div><b>${ex.prize}</b><p>${ex.perk}</p></div></div>`
+      :`<p style="font-size:17px">Not selected yet. You need 5 of 8. Go over the lessons with ${c.crew} and run it again.</p>`}
+    <p class="label">Caught ${G.busts} time${G.busts===1?'':'s'} · ${G.loot} loot picked up</p>
+    ${misses.length?`<div class="miss">${misses.map(m=>`<div class="m"><span class="qq">${esc(m.q)}</span><span class="aa">Answer: ${esc(m.ans)}</span><span class="ex">${esc(m.e)}</span></div>`).join("")}</div>`:''}
+    <div class="btns"><button class="btn go" data-a="hub">Back to the hideout</button><button class="btn" data-a="interview" data-id="${id}">Run it again</button>${hired?'':`<button class="btn" data-a="teach" data-id="${id}" data-k="0">Go over the lessons</button>`}</div>`, {kind:"result"});
+}
+function heistIntro(){
+  const n = CREW.filter(c=>S.hired[c.id]).length;
+  showOv(`<span class="label">The vault door · route: ${ORDER.map(id=>esc(byId(id).room)).join(" → ")}</span>
+    <div class="big">The <em>heist</em></div>
+    <p style="color:var(--muted);font-size:16px">24 locks across six rooms, four per chapter, with questions you haven't seen in the interviews. Every obstacle from the tryouts is in here. 60 seconds per lock. Wrong answers and getting caught each add one heat. Five heat and the alarm goes off.</p>
+    <div class="tbl"><table class="table"><thead><tr><th>Crew</th><th>Prize</th><th>Effect</th></tr></thead><tbody>
+      ${CREW.map(c=>{const ex=EXTRA[c.id], h=S.hired[c.id];return `<tr><td>${c.crew}</td><td>${h?ex.prize:'<span style="color:var(--muted)">Not hired</span>'}</td><td style="color:${h?'var(--ink)':'var(--muted)'}">${h?ex.perk:'—'}</td></tr>`}).join("")}
+    </tbody></table></div>
+    ${n<6?`<p style="color:var(--alarm)">${6-n} candidate${6-n===1?' is':'s are'} not hired yet. You can go in without their prizes.</p>`:''}
+    <div class="btns"><button class="btn go" data-a="heist">Start the heist</button><button class="btn" data-a="close">Keep planning</button></div>`, {kind:"heistIntro"});
+}
+function endHeist(alarm){
+  if(G.ended) return; G.ended=true; stopQ();
+  const R = {correct:G.correct, answered:G.answered, alarm, heat:G.heat, loot:G.loot, log:G.log};
+  const share = alarm?0:Math.round(R.correct/24*30*10)/10;
+  if(!alarm && (!S.best || R.correct>S.best.correct)){ S.best={correct:R.correct, share}; save(); }
+  const rows = ORDER.map(id=>{ const X=R.log.filter(x=>x.tag===id); return {id, ok:X.filter(x=>x.ok).length, n:X.length}; });
+  const weak = rows.filter(r=>r.n).sort((a,b)=>a.ok/a.n-b.ok/b.n)[0];
+  const misses = R.log.filter(x=>!x.ok);
+  showOv(`<span class="label">Debrief · ${R.answered} locks attempted</span>
+    ${alarm?`<div class="big" style="color:var(--alarm)">Alarm tripped</div><p>Five heat. The crew bailed out. Each run draws fresh questions, so go again.</p>`
+           :`<div class="big">Clean <em>getaway</em></div><p>You took <b style="color:var(--brass)">${share.toFixed(1)}%</b> of Rangmahal's market and ${R.loot} in loot.</p>`}
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:end">
+      <div><span class="label">Right</span><div class="score">${R.correct}<small> / ${R.answered}</small></div></div>
+      <div><span class="label">Exam equivalent</span><div class="score" style="font-size:clamp(40px,8vw,60px)">${Math.round(R.correct/24*25*10)/10}<small> / 25</small></div></div>
+    </div>
+    <div class="tbl"><table class="table"><thead><tr><th>Room</th><th>Chapter</th><th style="text-align:right">Right</th></tr></thead><tbody>
+      ${rows.map(r=>{const c=byId(r.id);return `<tr><td>${esc(c.room)}</td><td>${esc(c.src)}</td><td class="n">${r.n?r.ok+'/'+r.n:'—'}</td></tr>`}).join("")}
+    </tbody></table></div>
+    ${weak && weak.ok<weak.n?`<p>Weakest room: <b style="color:var(--brass)">${esc(byId(weak.id).room)}</b>. Go over ${esc(byId(weak.id).crew)}'s lessons.</p>`:''}
+    ${misses.length?`<span class="label">What went wrong</span><div class="miss">${misses.map(m=>`<div class="m"><span class="label">${esc(byId(m.tag).room)}</span><span class="qq">${esc(m.q)}</span><span style="color:var(--alarm);font-size:13.5px">You chose: ${esc(m.pick)}</span><span class="aa">Answer: ${esc(m.ans)}</span><span class="ex">${esc(m.e)}</span></div>`).join("")}</div>`:''}
+    <div class="btns"><button class="btn go" data-a="heist">Run it again</button><button class="btn" data-a="hub">Back to the hideout</button></div>`, {kind:"result"});
+}
+
+let resetArmed=false;
+ovc.addEventListener("click", ev=>{
+  const b = ev.target.closest("[data-a]"); if(!b || b.disabled) return;
+  const a = b.dataset.a;
+  if(a==="hub") return enterHub();
+  if(a==="close") return hideOv();
+  if(a==="teach") return talk(b.dataset.id, Number(b.dataset.k||0));
+  if(a==="interview") return startInterview(b.dataset.id);
+  if(a==="heist") return startHeist();
+  if(a==="pick" && OV && OV.kind==="q") return answer(OV, Number(b.dataset.i));
+  if(a==="qdone" && OV && OV.kind==="q") return closeQ(OV);
+  if(a==="tip" && OV && OV.kind==="q" && G.tips>0){ const Q=OV.term.q; G.tips--; Q.gone = shuffle(Q.opts.map((o,i)=>o.c?-1:i).filter(i=>i>=0)).slice(0,2); return renderQ(OV); }
+  if(a==="reset"){ if(!resetArmed){ resetArmed=true; b.textContent="Tap again to erase everything"; setTimeout(()=>{ resetArmed=false; if(b.isConnected) b.textContent="Reset progress"; },3000); return; }
+    S={stars:{},hired:{},best:null}; save(); resetArmed=false; return titleScreen(); }
+});
+
+/* =================================================================
+   RENDER
+   ================================================================= */
+const BG = {};
+function bgFor(th){
+  if(BG[th]) return BG[th];
+  let seed = th.length*977; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
+  const items=[]; for(let i=0;i<40;i++){ const w=40+rnd()*110, h= th==="roof" ? 120+rnd()*260 : 60+rnd()*300; items.push({x:i*95+rnd()*40, w, h, lights:Math.floor(rnd()*6)}); }
+  return BG[th]=items;
+}
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+function draw(){
+  const th = themeAt(camX+VW/2);
+  const thKey = Object.keys(TH).find(k=>TH[k]===th);
+  const gr = ctx.createLinearGradient(0,0,0,VH); gr.addColorStop(0,th.top); gr.addColorStop(1,th.bot);
+  ctx.fillStyle = gr; ctx.fillRect(0,0,VW,VH);
+  /* parallax */
+  if(thKey==="roof"){ ctx.fillStyle="rgba(255,240,210,.85)"; ctx.beginPath(); ctx.arc(780-camX*0.05%200, 90, 34, 0, Math.PI*2); ctx.fill(); }
+  const items = bgFor(thKey), par = 0.35, span = 40*95;
+  for(const it of items){
+    let x = ((it.x - camX*par) % span + span) % span - 120;
+    if(x>VW+20) continue;
+    ctx.fillStyle = th.deco;
+    if(thKey==="roof"){ ctx.fillRect(x, FL*T-it.h+40, it.w, it.h); ctx.fillStyle="rgba(255,214,140,.35)"; for(let l=0;l<it.lights;l++) ctx.fillRect(x+8+(l%3)*14, FL*T-it.h+60+Math.floor(l/3)*22, 6, 8); }
+    else if(thKey==="lab"||thKey==="vault"){ ctx.fillRect(x, 40, 10, FL*T-40); ctx.fillRect(x+it.w*0.6, 60, 4, FL*T-60); }
+    else if(thKey==="ware"){ ctx.fillRect(x, FL*T-it.h*0.7, it.w, it.h*0.7); ctx.strokeStyle="rgba(255,255,255,.04)"; ctx.strokeRect(x+.5, FL*T-it.h*0.7+.5, it.w-1, it.h*0.35); }
+    else if(thKey==="bank"){ ctx.fillRect(x, 40, 22, FL*T-40); ctx.fillRect(x-6, 40, 34, 10); ctx.fillRect(x-6, FL*T-12, 34, 12); }
+    else { ctx.beginPath(); ctx.arc(x+it.w/2, FL*T, it.h*0.55, Math.PI, 0); ctx.fill(); }
+  }
+  ctx.save(); ctx.translate(-Math.round(camX), 0);
+  /* tiles */
+  const c0 = Math.max(0,Math.floor(camX/T)-1), c1 = Math.min(L.w-1, c0+32);
+  for(let ty=0; ty<L.h; ty++) for(let tx=c0; tx<=c1; tx++){
+    const c = L.g[ty][tx]; if(c===".") continue;
+    const tt = themeAt(tx*T), x=tx*T, y=ty*T;
+    if(c==="X"){ ctx.fillStyle=tt.blk; ctx.fillRect(x,y,T,T);
+      if(tileAt(tx,ty-1)!=="X"){ ctx.fillStyle=tt.edge; ctx.fillRect(x,y,T,3); }
+      ctx.fillStyle="rgba(0,0,0,.18)"; ctx.fillRect(x+T-1,y,1,T); ctx.fillRect(x,y+T-1,T,1); }
+    else if(c==="S"){ ctx.fillStyle="#c9d2e3"; for(let i=0;i<4;i++){ ctx.beginPath(); ctx.moveTo(x+i*8,y+T); ctx.lineTo(x+i*8+4,y+T-16); ctx.lineTo(x+i*8+8,y+T); ctx.fill(); } }
+    else if(c==="C"){ const s=L.crumb[ty*L.w+tx]; if(s&&s.fallen) continue; const sh = s? (Math.random()-0.5)*3 : 0;
+      ctx.fillStyle=tt.blk; ctx.fillRect(x+sh,y,T,T*0.55); ctx.fillStyle=tt.edge; ctx.fillRect(x+sh,y,T,3);
+      ctx.strokeStyle="rgba(0,0,0,.45)"; ctx.beginPath(); ctx.moveTo(x+sh+6,y+4); ctx.lineTo(x+sh+14,y+12); ctx.lineTo(x+sh+10,y+17); ctx.moveTo(x+sh+22,y+3); ctx.lineTo(x+sh+18,y+14); ctx.stroke(); }
+  }
+  /* entities */
+  for(const e of L.ents) drawEnt(e);
+  if(P) drawPlayer();
+  /* prompt */
+  const tgt = !paused && interactTarget();
+  if(tgt){ const lbl = tgt.type==="term" ? (tgt.style==="safe"?"E  crack the safe":"E  use "+tgt.label.toLowerCase()) : tgt.type==="npc" ? "E  talk to "+byId(tgt.id).crew : "E  plan the heist";
+    ctx.font="600 13px 'Martian Mono', monospace"; const w=ctx.measureText(lbl).width+18; const px=tgt.x+tgt.w/2-w/2, py=tgt.y-34;
+    ctx.fillStyle="rgba(8,12,22,.88)"; rr(px,py,w,24,5); ctx.fill(); ctx.strokeStyle="#E8B04F"; ctx.stroke(); ctx.fillStyle="#EDF1F7"; ctx.fillText(lbl, px+9, py+16); }
+  ctx.restore();
+  if(flash>0){ ctx.fillStyle=`rgba(240,96,74,${flash*0.6})`; ctx.fillRect(0,0,VW,VH); }
+  drawHud(th);
+}
+
+function drawPerson(x,y,face,col,coat,hat,anim,opts={}){
+  const leg = Math.sin(anim/9)*5;
+  ctx.fillStyle="#0b0d14";
+  ctx.fillRect(x+4, y+22, 5, 8+ (opts.air?-2:0)); ctx.fillRect(x+11, y+22, 5, 8);
+  if(!opts.air){ ctx.fillRect(x+4+leg*0.4, y+26, 5, 4); ctx.fillRect(x+11-leg*0.4, y+26, 5, 4); }
+  ctx.fillStyle=coat; rr(x+1,y+10,18,15,4); ctx.fill();
+  ctx.fillStyle="#e2b894"; ctx.fillRect(x+4,y+2,12,10);
+  ctx.fillStyle=hat; ctx.fillRect(x+3,y-1,14,5); if(opts.cap){ ctx.fillRect(face>0?x+12:x-2,y+3,10,2); }
+  ctx.fillStyle="#0b0d14"; ctx.fillRect(face>0?x+11:x+6, y+6, 3, 2);
+  if(opts.mask){ ctx.fillStyle="#111"; ctx.fillRect(x+4,y+5,12,3); ctx.fillStyle="#fff"; ctx.fillRect(face>0?x+12:x+6,y+5,2,2); }
+  ctx.fillStyle=col; ctx.fillRect(x+1,y+14,18,2);
+}
+function drawPlayer(){
+  if(P.dead>0 && Math.floor(P.dead*12)%2===0) return;
+  drawPerson(P.x, P.y, P.face, "#E8B04F", "#1d2536", "#E8B04F", P.anim, {air:!P.on, mask:true});
+}
+
+function drawEnt(e){
+  if(e.x > camX+VW+80 || e.x+ (e.w||0) < camX-200) { if(e.type!=="guard" && e.type!=="cam") return; }
+  const t=time;
+  if(e.type==="coin"){ if(e.got) return; ctx.fillStyle="#6FD39A"; rr(e.x,e.y+Math.sin(t*4+e.x)*2,12,14,2); ctx.fill(); ctx.fillStyle="#1a4a31"; ctx.fillRect(e.x+5,e.y+2+Math.sin(t*4+e.x)*2,2,10); }
+  else if(e.type==="mover"){ ctx.fillStyle="#8aa0c8"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.fillStyle="#E8B04F"; for(let i=0;i<e.w;i+=16) ctx.fillRect(e.x+i,e.y,8,4); }
+  else if(e.type==="term"){
+    if(e.style==="safe"){ ctx.fillStyle=e.done?"#3a6b4f":"#5c6474"; rr(e.x-6,e.y+6,42,40,4); ctx.fill(); ctx.fillStyle="#2a2f3a"; ctx.beginPath(); ctx.arc(e.x+15,e.y+26,11,0,Math.PI*2); ctx.fill(); ctx.strokeStyle=e.done?"#6FD39A":"#E8B04F"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x+15,e.y+26,11,0,Math.PI*2); ctx.stroke(); ctx.lineWidth=1;
+      const a=e.done?0:t*1.5; ctx.beginPath(); ctx.moveTo(e.x+15,e.y+26); ctx.lineTo(e.x+15+Math.cos(a)*9,e.y+26+Math.sin(a)*9); ctx.stroke(); }
+    else { ctx.fillStyle="#2b3246"; ctx.fillRect(e.x+8,e.y+20,14,26); ctx.fillStyle="#3b4460"; rr(e.x,e.y,30,24,3); ctx.fill();
+      ctx.fillStyle=e.done?"#6FD39A":`rgba(143,200,236,${0.6+0.4*Math.sin(t*5)})`; ctx.fillRect(e.x+4,e.y+4,22,14);
+      ctx.fillStyle="#0b0f1c"; ctx.font="700 10px 'Martian Mono', monospace"; ctx.fillText(e.done?"OK":"?", e.x+(e.done?9:12), e.y+15); }
+  }
+  else if(e.type==="gate"){ const h = e.open ? Math.max(0, (e.h)*(1-Math.min(1,(e.openT=(e.openT||0)+1/60)*2))) : e.h;
+    if(e.open && h<=0) return; ctx.fillStyle="#5b6478"; for(let i=0;i<3;i++) ctx.fillRect(e.x+i*6, 0, 3, h); ctx.fillStyle="#E8B04F"; ctx.fillRect(e.x-2, h-8, e.w+4, 8); }
+  else if(e.type==="exit"){ ctx.fillStyle="#1c2a22"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.strokeStyle="#6FD39A"; ctx.lineWidth=2; ctx.strokeRect(e.x+1,e.y+1,e.w-2,e.h-2); ctx.lineWidth=1;
+    ctx.fillStyle="#6FD39A"; ctx.font="700 12px 'Martian Mono', monospace"; ctx.fillText(G.mode==="heist"?"VAN":"EXIT", e.x+(G.mode==="heist"?12:8), e.y-8); }
+  else if(e.type==="sign"){ ctx.fillStyle="rgba(8,12,22,.75)"; rr(e.x-10,e.y,230,50,6); ctx.fill(); ctx.strokeStyle="rgba(232,176,79,.6)"; ctx.stroke();
+    ctx.fillStyle="#E8B04F"; ctx.font="600 10px 'Martian Mono', monospace"; ctx.fillText(e.sub.toUpperCase(), e.x, e.y+17); ctx.fillStyle="#EDF1F7"; ctx.font="800 22px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(e.text.toUpperCase(), e.x, e.y+41); }
+  else if(e.type==="laser"){ ctx.fillStyle="#394260"; ctx.fillRect(e.x-7,e.y1,14,8); ctx.fillRect(e.x-7,e.y2-8,14,8);
+    if(e.lit){ ctx.fillStyle="rgba(255,60,60,.25)"; ctx.fillRect(e.x-6,e.y1+8,12,e.y2-e.y1-16); ctx.fillStyle="#ff4b3e"; ctx.fillRect(e.x-2,e.y1+8,4,e.y2-e.y1-16); }
+    else if(e.warn){ ctx.fillStyle=`rgba(255,80,60,${0.3+0.3*Math.sin(t*40)})`; ctx.fillRect(e.x-1,e.y1+8,2,e.y2-e.y1-16); }
+    else { ctx.fillStyle="rgba(255,80,60,.12)"; for(let yy=e.y1+10; yy<e.y2-10; yy+=10) ctx.fillRect(e.x-1,yy,2,4); } }
+  else if(e.type==="guard"){ const f=e.dir, len=e.len||170;
+    ctx.fillStyle="rgba(255,230,120,.16)"; ctx.beginPath(); ctx.moveTo(e.ex,e.ey); ctx.lineTo(e.ex+f*len, e.ey-22); ctx.lineTo(e.ex+f*len, FL*T); ctx.closePath(); ctx.fill();
+    ctx.save(); ctx.translate(e.x,e.y); ctx.scale(1.1,1.33); drawPerson(0,0,f,"#E8B04F","#2d3a52","#1a2233",e.wait>0?0:e.x,{cap:true}); ctx.restore();
+    ctx.fillStyle="#ffe07a"; ctx.fillRect(f>0?e.x+e.w-2:e.x-4, e.y+12, 6, 4); }
+  else if(e.type==="cam"){ const a=e.ang||Math.PI/2, r=e.range;
+    ctx.fillStyle = e.det>0.05 ? `rgba(240,96,74,${0.22+e.det})` : "rgba(143,200,236,.13)";
+    ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.arc(e.x,e.y,r,a-e.half,a+e.half); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#6a738c"; ctx.fillRect(e.x-10,e.y-10,20,8); ctx.save(); ctx.translate(e.x,e.y); ctx.rotate(a); ctx.fillStyle="#aab3c8"; ctx.fillRect(0,-5,18,10); ctx.fillStyle=e.det>0.05?"#F0604A":"#8FC8EC"; ctx.fillRect(16,-3,4,6); ctx.restore(); }
+  else if(e.type==="npc"){ const c=byId(e.id), ex=EXTRA[e.id], hired=S.hired[e.id];
+    const face = P ? (P.x < e.x ? -1 : 1) : 1;
+    drawPerson(e.x, e.y+4+Math.sin(time*2+e.bob)*1, face, ex.col, ex.coat, ex.hat, 0, {});
+    ctx.fillStyle="rgba(8,12,22,.8)"; rr(e.x-26,e.y-40,74,32,5); ctx.fill(); ctx.strokeStyle=hired?"#6FD39A":ex.col; ctx.stroke();
+    ctx.fillStyle="#EDF1F7"; ctx.font="800 14px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.textAlign="center"; ctx.fillText(c.crew.replace("The ","").toUpperCase(), e.x+11, e.y-26);
+    ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillStyle=hired?"#6FD39A":"#A5B4CB"; ctx.fillText(hired?("HIRED · "+ex.pic):"WAITING", e.x+11, e.y-14); ctx.textAlign="left";
+    if(!hired){ ctx.fillStyle=ex.col; ctx.font="900 18px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("!", e.x+8, e.y-46+Math.sin(time*4)*2); } }
+  else if(e.type==="board"){ ctx.fillStyle="#2a2034"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.strokeStyle="#9a82bd"; ctx.strokeRect(e.x+.5,e.y+.5,e.w-1,e.h-1);
+    ctx.fillStyle="#EDF1F7"; ctx.font="900 26px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("TARGET: RANGMAHAL INDUSTRIES", e.x+16, e.y+34);
+    ctx.font="600 11px 'Martian Mono', monospace"; ctx.fillStyle="#A5B4CB"; ctx.fillText("Teach 6 candidates · pass their interviews · take the moat", e.x+16, e.y+54);
+    CREW.forEach((c,i)=>{ const x=e.x+16+i*60, y=e.y+70; const h=S.hired[c.id]; ctx.fillStyle=h?EXTRA[c.id].col:"#3a3048"; ctx.fillRect(x,y,48,60); ctx.fillStyle="#0b0f1c"; ctx.font="900 20px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(c.ini, x+10, y+28);
+      ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillText(h?EXTRA[c.id].pic:"--", x+16, y+50); ctx.fillStyle="#F0604A"; ctx.beginPath(); ctx.arc(x+24,y-2,3,0,Math.PI*2); ctx.fill(); });
+    ctx.strokeStyle="rgba(240,96,74,.6)"; ctx.beginPath(); CREW.forEach((c,i)=>{ const x=e.x+40+i*60, y=e.y+68; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); }
+  else if(e.type==="table"){ ctx.fillStyle="#4a3a2c"; ctx.fillRect(e.x,e.y,e.w,8); ctx.fillRect(e.x+8,e.y+8,6,e.h-8); ctx.fillRect(e.x+e.w-14,e.y+8,6,e.h-8); ctx.fillStyle="#d9e3ef"; ctx.fillRect(e.x+30,e.y-3,60,4); ctx.fillStyle="#8FC8EC"; ctx.fillRect(e.x+100,e.y-4,40,5); }
+  else if(e.type==="vault"){ const all = CREW.every(c=>S.hired[c.id]);
+    ctx.fillStyle="#2e3343"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.fillStyle="#95a0b8"; ctx.beginPath(); ctx.arc(e.x+e.w/2,e.y+e.h/2,46,0,Math.PI*2); ctx.fill(); ctx.fillStyle="#2e3343"; ctx.beginPath(); ctx.arc(e.x+e.w/2,e.y+e.h/2,36,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#E8B04F"; ctx.lineWidth=4; for(let i=0;i<3;i++){ const a=time*0.3+i*2.09; ctx.beginPath(); ctx.moveTo(e.x+e.w/2,e.y+e.h/2); ctx.lineTo(e.x+e.w/2+Math.cos(a)*30,e.y+e.h/2+Math.sin(a)*30); ctx.stroke(); } ctx.lineWidth=1;
+    ctx.fillStyle=all?"#6FD39A":"#E8B04F"; ctx.font="600 11px 'Martian Mono', monospace"; ctx.textAlign="center"; ctx.fillText(all?"CREW READY":"THE HEIST", e.x+e.w/2, e.y-10); ctx.textAlign="left"; }
+}
+
+function drawHud(th){
+  ctx.font="600 11px 'Martian Mono', monospace";
+  const pill=(x,y,w,txt,col)=>{ ctx.fillStyle="rgba(8,12,22,.78)"; rr(x,y,w,26,5); ctx.fill(); ctx.fillStyle=col||"#EDF1F7"; ctx.fillText(txt,x+10,y+17); };
+  if(!G) return;
+  if(G.mode==="hub"){ const n=CREW.filter(c=>S.hired[c.id]).length; pill(12,12,250,"HIDEOUT · "+n+" of 6 hired"); if(S.best) pill(270,12,190,"BEST HEIST "+S.best.correct+"/24","#E8B04F"); }
+  else {
+    const done = L.terms.filter(t=>t.done).length;
+    const title = G.mode==="heist" ? "HEIST · "+themeAt(P.x).name.toUpperCase() : byId(G.id).crew.toUpperCase()+" · "+EXTRA[G.id].lvl.toUpperCase();
+    ctx.font="600 11px 'Martian Mono', monospace"; const tw=ctx.measureText(title).width+20; pill(12,12,tw,title,"#E8B04F");
+    pill(12,44,230,"LOCKS "+done+"/"+L.terms.length+" · RIGHT "+G.correct);
+    const lootTxt="LOOT "+G.loot+" · CAUGHT "+G.busts; const lw=ctx.measureText(lootTxt).width+20; pill(VW-lw-12,12,lw,lootTxt);
+    if(G.mode==="heist"){ ctx.fillStyle="rgba(8,12,22,.78)"; rr(VW-178,44,166,26,5); ctx.fill(); ctx.fillStyle="#EDF1F7"; ctx.fillText("HEAT",VW-168,61);
+      for(let i=0;i<MAX_HEAT;i++){ ctx.strokeStyle="#F0604A"; ctx.strokeRect(VW-118+i*20+.5,50.5,14,14); if(i<G.heat){ ctx.fillStyle="#F0604A"; ctx.fillRect(VW-118+i*20,50,15,15); } }
+      const perks=CREW.filter(c=>S.hired[c.id]).map(c=>EXTRA[c.id].pic); if(perks.length){ const pt="KIT "+perks.join(" "); const pw=ctx.measureText(pt).width+20; pill(VW-pw-12,76,pw,pt,"#6FD39A"); } }
+  }
+  if(toast){ ctx.font="600 13px 'Instrument Sans', sans-serif"; const w=Math.min(VW-40, ctx.measureText(toast.t).width+28); const a=Math.min(1,toast.life);
+    ctx.globalAlpha=a; ctx.fillStyle="rgba(8,12,22,.9)"; rr(VW/2-w/2, VH-54, w, 34, 6); ctx.fill(); ctx.strokeStyle="#E8B04F"; ctx.stroke(); ctx.fillStyle="#EDF1F7"; ctx.textAlign="center"; ctx.fillText(toast.t, VW/2, VH-32); ctx.textAlign="left"; ctx.globalAlpha=1; }
+}
+
+/* =================================================================
+   LOOP
+   ================================================================= */
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(0.033, (now-last)/1000); last = now;
+  if(L && !paused){
+    time += dt;
+    stepEnts(dt); stepPlayer(dt); stepInteract();
+    const target = P.x - VW*0.4; camX += (Math.max(0, Math.min(L.w*T-VW, target)) - camX) * Math.min(1, dt*8);
+  }
+  KP.j=false; KP.e=false;
+  if(flash>0) flash=Math.max(0,flash-dt);
+  if(toast){ toast.life-=dt; if(toast.life<=0) toast=null; }
+  if(L) draw();
+  requestAnimationFrame(frame);
+}
+enterHub(); paused=true; titleScreen();
+requestAnimationFrame(frame);
+
+</script>
+
+</body>
+</html>
