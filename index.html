@@ -550,7 +550,7 @@ const hasPrize = id => !!S.hired[id];
    ENGINE: constants, canvas, input
    ================================================================= */
 const T = 32, VW = 960, VH = 544, FL = 14;           /* floor top row */
-const GRAV = 1900, JUMP = 640, SPEED = 235;
+const GRAV = 1850, JUMP = 680, SPEED = 230;
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
 const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const K = { l:false, r:false, j:false, e:false }, KP = { j:false, e:false };
@@ -607,7 +607,7 @@ function buildRun(spec){
       term.gate = gate;
       L2.ents.push(term, gate); L2.terms.push(term);
     });
-    L2.ranges.push({x0:r0, x1:x, th:curTh});
+    L2.ranges.push({x0:r0, x1:x, th:curTh, id:room.id});
   });
   flat(10);
   L2.ents.push({type:"exit", x:(x-6)*T, y:FL*T-72, w:48, h:72});
@@ -624,15 +624,15 @@ function segment(L2, kind, x0, th, n){
   const carve = (a,b)=>{ for(let c=a;c<=b;c++) for(let y=FL;y<17;y++) g[y][c]="."; };
   const block = (c,h)=>{ for(let k=1;k<=h;k++) g[FL-k][c]="X"; };
   const coins = (cx, cy, k)=>{ for(let i=0;i<k;i++) E.push({type:"coin", x:(cx+i)*T+10, y:cy*T+8, w:12, h:14, got:false}); };
-  const laser = (c, opt={})=>E.push(Object.assign({type:"laser", x:c*T+16, y1:ce?T:0, y2:FL*T, per:2.4, on:.46, ph:Math.random()*2}, opt));
-  const trip = (c, opt={})=>E.push(Object.assign({type:"laser", trip:true, x:c*T+16, y1:FL*T-34, y2:FL*T, per:1, on:1, ph:0}, opt));
-  const guard = (a,b,opt={})=>E.push(Object.assign({type:"guard", x:b*T, y:FL*T-40, w:22, h:40, a:a*T, b:b*T, dir:-1, sp:R(50,70), wait:0}, opt));
-  const cam = (c,opt={})=>E.push(Object.assign({type:"cam", x:c*T+16, y:(ce?T:0)+10, mid:Math.PI/2, amp:0.5+Math.random()*0.25, per:3.4+Math.random()*1.8, ph:Math.random()*4, range:470, half:0.2, det:0}, opt));
+  const laser = (c, opt={})=>E.push(Object.assign({type:"laser", x:c*T+16, y1:ce?T:0, y2:FL*T, per:2.8, on:.38, ph:Math.random()*2}, opt));
+  const trip = (c, opt={})=>E.push(Object.assign({type:"laser", trip:true, x:c*T+16, y1:FL*T-24, y2:FL*T, per:1, on:1, ph:0}, opt));
+  const guard = (a,b,opt={})=>E.push(Object.assign({type:"guard", x:b*T, y:FL*T-40, w:22, h:40, a:a*T, b:b*T, dir:-1, sp:R(38,52), wait:0}, opt));
+  const cam = (c,opt={})=>E.push(Object.assign({type:"cam", x:c*T+16, y:(ce?T:0)+10, mid:Math.PI/2, amp:0.45+Math.random()*0.2, per:4.8+Math.random()*1.6, ph:Math.random()*4, range:470, half:0.16, det:0}, opt));
   const [base, add] = kind.split("+");
   let w = 12;
   const fill = n2 => { w=n2; for(let i=0;i<w;i++) colF(x0+i); };
   switch(base){
-    case "pit": { fill(11); const gp=R(2,4); carve(x0+4,x0+3+gp); coins(x0+4,11,gp); break; }
+    case "pit": { fill(11); const gp=R(2,3); carve(x0+4,x0+3+gp); coins(x0+4,11,gp); break; }
     case "pit2": fill(14); carve(x0+3,x0+5); carve(x0+8,x0+10); coins(x0+6,11,2); break;
     case "pit3": fill(18); carve(x0+2,x0+3); carve(x0+8,x0+9); carve(x0+14,x0+15); coins(x0+2,11,2); coins(x0+8,11,2); coins(x0+14,11,2); break;
     case "spikes": fill(13); for(let c=x0+3;c<=x0+5;c++) g[FL-1][c]="S"; block(x0+6,2); block(x0+7,2); for(let c=x0+8;c<=x0+10;c++) g[FL-1][c]="S"; coins(x0+6,10,2); break;
@@ -642,12 +642,12 @@ function segment(L2, kind, x0, th, n){
     case "elevator": { fill(13); carve(x0+3,x0+5); for(let c=x0+6;c<=x0+9;c++) block(c,6);
       E.push({type:"mover", axis:"y", x:(x0+3)*T, y:FL*T, w:3*T, h:14, a:(FL-6)*T-6, b:FL*T, dir:-1, sp:R(60,85), solid:true, dx:0, dy:0}); coins(x0+6,6,4); break; }
     case "spring": { fill(12); block(x0+6,5); block(x0+7,5); E.push({type:"spring", x:(x0+3)*T, y:FL*T-10, w:2*T, h:10, sq:0}); coins(x0+6,6,2); break; }
-    case "laser": fill(16); [4,8,12].forEach((c,i)=>laser(x0+c,{per:2.1+Math.random()*0.7, ph:i*0.8+n*0.3})); coins(x0+6,12,4); break;
-    case "laserFast": fill(17); [3,6,9,12].forEach((c,i)=>laser(x0+c,{per:1.5, on:.42, ph:i*0.35})); coins(x0+4,12,4); break;
+    case "laser": fill(16); [4,9,13].forEach((c,i)=>laser(x0+c,{per:2.7+Math.random()*0.5, ph:i*0.9+n*0.3})); coins(x0+6,12,4); break;
+    case "laserFast": fill(16); [4,8,12].forEach((c,i)=>laser(x0+c,{per:2.0, on:.34, ph:i*0.45})); coins(x0+5,12,4); break;
     case "laserTrip": fill(16); trip(x0+3); laser(x0+6,{per:2.2,ph:n}); trip(x0+9); laser(x0+12,{per:2.2,ph:n+1.1}); trip(x0+14); coins(x0+8,11,3); break;
     case "laserMove": fill(17); trip(x0+4,{mv:true, a:(x0+3)*T+16, b:(x0+13)*T+16, sp:R(90,130), dir:1}); trip(x0+10,{mv:true, a:(x0+3)*T+16, b:(x0+13)*T+16, sp:R(60,90), dir:-1}); coins(x0+6,12,4); break;
     case "guard": fill(16); block(x0+4,2); for(let c=x0+5;c<=x0+10;c++) g[11][c]="X"; guard(x0+6,x0+13); coins(x0+6,10,4); break;
-    case "guard2": fill(19); block(x0+8,2); block(x0+9,2); guard(x0+2,x0+6,{dir:1,x:(x0+2)*T}); guard(x0+11,x0+16); coins(x0+8,10,2); break;
+    case "guard2": fill(19); block(x0+8,2); block(x0+9,2); guard(x0+4,x0+7,{dir:1,x:(x0+4)*T}); guard(x0+11,x0+16); coins(x0+8,10,2); break;
     case "camera": fill(17); for(const c of [x0+4,x0+5,x0+11,x0+12]) block(c,2); cam(x0+8); coins(x0+6,12,4); break;
     case "cam2": fill(20); for(const c of [x0+3,x0+4,x0+9,x0+10,x0+15,x0+16]) block(c,2); cam(x0+6); cam(x0+13,{ph:2}); coins(x0+7,12,2); coins(x0+12,12,2); break;
     case "crumble": fill(15); carve(x0+2,x0+12); for(let c=x0+2;c<=x0+12;c++) g[FL][c]="C"; coins(x0+4,11,5); break;
@@ -667,7 +667,7 @@ function buildHub(){
   for(let y=0;y<17;y++){ g[y][0]="X"; g[y][W-1]="X"; }
   /* small stage for the vault door */
   L2.ranges.push({x0:0,x1:W,th:"hub"});
-  L2.ents.push({type:"board", x:14*T, y:3*T, w:12*T, h:5*T});
+  L2.ents.push({type:"board", x:14*T, y:2*T+16, w:12*T, h:6*T});
   L2.ents.push({type:"table", x:17*T, y:FL*T-34, w:6*T, h:34});
   CREW.forEach((c,i)=>L2.ents.push({type:"npc", id:c.id, x:[4,8,12,28,32,36][i]*T, y:FL*T-34, w:22, h:34, face:1, bob:Math.random()*6}));
   L2.ents.push({type:"vault", x:42*T, y:FL*T-120, w:4*T, h:120});
@@ -686,11 +686,11 @@ function solids(){ return L.ents.filter(e=>e.solid && !(e.type==="gate" && e.ope
 function overlap(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
 
 function stepPlayer(dt){
-  if(P.dead>0){ P.dead-=dt; if(P.dead<=0){ P.x=P.cx; P.y=P.cy; P.vx=0; P.vy=0; } return; }
+  if(P.dead>0){ P.dead-=dt; if(P.dead<=0){ P.x=P.cx; P.y=P.cy; P.vx=0; P.vy=0; P.safe=1.8; } return; }
   const dir = (K.r?1:0) - (K.l?1:0);
   P.vx = dir*SPEED; if(dir) P.face = dir;
   if(KP.j) P.buf = 0.12; else P.buf = Math.max(0, P.buf-dt);
-  P.coy = P.on ? 0.1 : Math.max(0, P.coy-dt);
+  P.coy = P.on ? 0.14 : Math.max(0, P.coy-dt); if(P.safe>0) P.safe-=dt;
   const dbl = G && G.mode==="heist" && hasPrize("q");
   if(P.buf>0){
     if(P.on || P.coy>0){ P.vy = -JUMP; P.on=false; P.coy=0; P.buf=0; P.jumps=1; P.ride=null; }
@@ -721,17 +721,20 @@ function stepPlayer(dt){
   /* springs */
   for(const e of L.ents) if(e.type==="spring" && P.vy>=0 && P.x+P.w>e.x+2 && P.x<e.x+e.w-2 && P.y+P.h>=e.y-2 && P.y+P.h<=e.y+e.h+2){ P.vy=-940; P.on=false; P.boost=true; P.jumps=1; e.sq=0.25; }
   /* crumble trigger */
-  if(P.on){ for(const px of [lx,rx]){ const tx=Math.floor(px/T), ty=Math.floor((P.y+P.h+2)/T); if(tileAt(tx,ty)==="C"){ const k=ty*L.w+tx; if(!L.crumb[k]) L.crumb[k]={t: (G&&G.mode==="heist"&&hasPrize("t"))?0.9:0.5, fallen:false, rt:0}; } } }
+  if(P.on){ for(const px of [lx,rx]){ const tx=Math.floor(px/T), ty=Math.floor((P.y+P.h+2)/T); if(tileAt(tx,ty)==="C"){ const k=ty*L.w+tx; if(!L.crumb[k]) L.crumb[k]={t: (G&&G.mode==="heist"&&hasPrize("t"))?1.3:0.85, fallen:false, rt:0}; } } }
   P.anim += Math.abs(P.vx)*dt;
   /* hazards */
   if(P.y > L.h*T) return caught("You fell.");
-  for(const [px,py] of [[P.x+4,P.y+P.h-3],[P.x+P.w-4,P.y+P.h-3],[P.x+P.w/2,P.y+P.h/2]]){ if(tileAt(Math.floor(px/T),Math.floor(py/T))==="S" && (py%T) > 14) return caught("Spikes."); }
+  for(const [px,py] of [[P.x+4,P.y+P.h-3],[P.x+P.w-4,P.y+P.h-3],[P.x+P.w/2,P.y+P.h/2]]){ if(tileAt(Math.floor(px/T),Math.floor(py/T))==="S" && (py%T) > 18) return caught("Spikes."); }
 }
 
+function roomAt(x){ for(const r of L.ranges) if(x>=r.x0*T && x<r.x1*T) return r.id; return null; }
 function caught(why){
-  if(P.dead>0) return;
+  if(P.dead>0 || P.safe>0) return;
   P.dead = 0.75; flash = 0.5; G.busts++;
-  if(G.mode==="heist"){ G.heat++; say(why+" Heat +1."); if(G.heat>=MAX_HEAT) setTimeout(()=>endHeist(true), 700); }
+  if(G.mode==="heist"){ const rid=roomAt(P.x)||"x"; G.free=G.free||{};
+    if(!G.free[rid]){ G.free[rid]=true; say(why+" Uhm, the crew covered you this once. No heat."); }
+    else { G.heat++; say(why+" Heat +1."); if(G.heat>=MAX_HEAT) setTimeout(()=>endHeist(true), 700); } }
   else say(why+" Back to the last checkpoint.");
 }
 function say(t){ toast = {t, life:2.2}; }
@@ -745,13 +748,13 @@ function stepEnts(dt){
       else { const ox=e.x; e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;e.wait=0.5;} if(e.x<e.a){e.x=e.a;e.dir=1;e.wait=0.5;} e.dx = e.x-ox; e.dy=0; } }
     else if(e.type==="spring"){ e.sq=Math.max(0,(e.sq||0)-dt); }
     else if(e.type==="laser"){ if(e.mv){ e.x += e.dir*e.sp*dt; if(e.x>e.b){e.x=e.b;e.dir=-1;} if(e.x<e.a){e.x=e.a;e.dir=1;} }
-      const on = e.trip ? 1 : (smoke ? e.on*0.62 : e.on); const ph=((time+e.ph)%e.per)/e.per; e.lit = ph<on; e.warn = !e.lit && ph>1-0.14;
+      const on = e.trip ? 1 : (smoke ? e.on*0.62 : e.on); const ph=((time+e.ph)%e.per)/e.per; e.lit = ph<on; e.warn = !e.lit && ph>1-0.2;
       if(e.lit && P.dead<=0 && P.x < e.x+4 && P.x+P.w > e.x-4 && P.y+P.h > e.y1 && P.y < e.y2) caught("Laser tripped."); }
     else if(e.type==="guard"){
       if(e.wait>0){ e.wait-=dt; if(e.wait<=0) e.dir*=-1; }
-      else { e.x += e.dir*e.sp*dt; if(e.x>e.b){ e.x=e.b; e.wait=1; } if(e.x<e.a){ e.x=e.a; e.wait=1; } }
+      else { e.x += e.dir*e.sp*dt; if(e.x>e.b){ e.x=e.b; e.wait=1.6; } if(e.x<e.a){ e.x=e.a; e.wait=1.6; } }
       const face = e.wait>0 ? e.dir : e.dir;
-      e.len = jacket ? 80 : 170;
+      e.len = jacket ? 60 : 120;
       e.ex = e.x + (face>0? e.w : 0); e.ey = e.y+10;
       if(P.dead<=0){
         if(overlap(P,e)) { caught("The guard grabbed you."); continue; }
@@ -770,7 +773,7 @@ function stepEnts(dt){
           if(Math.abs(a)<e.half){ seen=true; const steps=Math.floor(d/8); for(let i=2;i<steps;i++){ const px=e.x+dx*i/steps, py=e.y+dy*i/steps; if(solidPt(px,py)){ seen=false; break; } } } }
       }
       e.det = seen ? e.det+dt : Math.max(0,e.det-dt*2);
-      if(e.det>0.6){ e.det=0; caught("The camera saw you."); }
+      if(e.det>1.0){ e.det=0; caught("The camera saw you."); }
     }
   }
   for(const k in L.crumb){ const s=L.crumb[k];
@@ -1088,7 +1091,7 @@ function drawPerson(x,y,face,col,coat,hat,anim,opts={}){
   ctx.fillStyle=col; ctx.fillRect(x+1,y+14,18,2);
 }
 function drawPlayer(){
-  if(P.dead>0 && Math.floor(P.dead*12)%2===0) return;
+  if((P.dead>0 && Math.floor(P.dead*12)%2===0) || (P.safe>0 && Math.floor(P.safe*10)%2===0)) return;
   drawPerson(P.x, P.y, P.face, "#E8B04F", "#1d2536", "#E8B04F", P.anim, {air:!P.on, mask:true});
 }
 
@@ -1127,16 +1130,17 @@ function drawEnt(e){
   else if(e.type==="npc"){ const c=byId(e.id), ex=EXTRA[e.id], hired=S.hired[e.id];
     const face = P ? (P.x < e.x ? -1 : 1) : 1;
     drawPerson(e.x, e.y+4+Math.sin(time*2+e.bob)*1, face, ex.col, ex.coat, ex.hat, 0, {});
-    ctx.fillStyle="rgba(8,12,22,.8)"; rr(e.x-26,e.y-40,74,32,5); ctx.fill(); ctx.strokeStyle=hired?"#6FD39A":ex.col; ctx.stroke();
+    ctx.font="800 14px 'Big Shoulders Stencil Display', Impact, sans-serif"; const nmw=ctx.measureText(c.crew.replace("The ","").toUpperCase()).width; ctx.font="600 9px 'Martian Mono', monospace"; const tgw=ctx.measureText(hired?("ON CREW · "+ex.pic):"WILL TEACH").width; const bw=Math.max(nmw,tgw)+18;
+    ctx.fillStyle="rgba(8,12,22,.8)"; rr(e.x+11-bw/2,e.y-40,bw,32,5); ctx.fill(); ctx.strokeStyle=hired?"#6FD39A":ex.col; ctx.stroke();
     ctx.fillStyle="#EDF1F7"; ctx.font="800 14px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.textAlign="center"; ctx.fillText(c.crew.replace("The ","").toUpperCase(), e.x+11, e.y-26);
     ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillStyle=hired?"#6FD39A":"#A5B4CB"; ctx.fillText(hired?("ON CREW · "+ex.pic):"WILL TEACH", e.x+11, e.y-14); ctx.textAlign="left";
     if(!hired){ ctx.fillStyle=ex.col; ctx.font="900 18px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("!", e.x+8, e.y-46+Math.sin(time*4)*2); } }
   else if(e.type==="board"){ ctx.fillStyle="#2a2034"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.strokeStyle="#9a82bd"; ctx.strokeRect(e.x+.5,e.y+.5,e.w-1,e.h-1);
-    ctx.fillStyle="#EDF1F7"; ctx.font="900 26px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("TARGET: SUCHIR'S LIQUOR SHOP", e.x+16, e.y+34);
-    ctx.font="600 11px 'Martian Mono', monospace"; ctx.fillStyle="#A5B4CB"; ctx.fillText("Learn from 6 master thieves · pass their trials · hit the shop", e.x+16, e.y+54);
-    CREW.forEach((c,i)=>{ const x=e.x+16+i*60, y=e.y+70; const h=S.hired[c.id]; ctx.fillStyle=h?EXTRA[c.id].col:"#3a3048"; ctx.fillRect(x,y,48,60); ctx.fillStyle="#0b0f1c"; ctx.font="900 20px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(c.ini, x+10, y+28);
+    ctx.fillStyle="#EDF1F7"; ctx.font="900 25px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText("TARGET: SUCHIR'S LIQUOR SHOP", e.x+16, e.y+34, e.w-32);
+    ctx.font="600 11px 'Martian Mono', monospace"; ctx.fillStyle="#A5B4CB"; ctx.fillText("Learn from 6 master thieves", e.x+16, e.y+56, e.w-32); ctx.fillText("Pass their trials · hit the shop", e.x+16, e.y+72, e.w-32);
+    CREW.forEach((c,i)=>{ const x=e.x+16+i*60, y=e.y+96; const h=S.hired[c.id]; ctx.fillStyle=h?EXTRA[c.id].col:"#3a3048"; ctx.fillRect(x,y,48,60); ctx.fillStyle="#0b0f1c"; ctx.font="900 20px 'Big Shoulders Stencil Display', Impact, sans-serif"; ctx.fillText(c.ini, x+10, y+28);
       ctx.font="600 9px 'Martian Mono', monospace"; ctx.fillText(h?EXTRA[c.id].pic:"--", x+16, y+50); ctx.fillStyle="#F0604A"; ctx.beginPath(); ctx.arc(x+24,y-2,3,0,Math.PI*2); ctx.fill(); });
-    ctx.strokeStyle="rgba(240,96,74,.6)"; ctx.beginPath(); CREW.forEach((c,i)=>{ const x=e.x+40+i*60, y=e.y+68; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); }
+    ctx.strokeStyle="rgba(240,96,74,.6)"; ctx.beginPath(); CREW.forEach((c,i)=>{ const x=e.x+40+i*60, y=e.y+94; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke(); }
   else if(e.type==="table"){ ctx.fillStyle="#4a3a2c"; ctx.fillRect(e.x,e.y,e.w,8); ctx.fillRect(e.x+8,e.y+8,6,e.h-8); ctx.fillRect(e.x+e.w-14,e.y+8,6,e.h-8); ctx.fillStyle="#d9e3ef"; ctx.fillRect(e.x+30,e.y-3,60,4); ctx.fillStyle="#8FC8EC"; ctx.fillRect(e.x+100,e.y-4,40,5); }
   else if(e.type==="vault"){ const all = CREW.every(c=>S.hired[c.id]);
     ctx.fillStyle="#2e3343"; ctx.fillRect(e.x,e.y,e.w,e.h); ctx.fillStyle="#95a0b8"; ctx.beginPath(); ctx.arc(e.x+e.w/2,e.y+e.h/2,46,0,Math.PI*2); ctx.fill(); ctx.fillStyle="#2e3343"; ctx.beginPath(); ctx.arc(e.x+e.w/2,e.y+e.h/2,36,0,Math.PI*2); ctx.fill();
