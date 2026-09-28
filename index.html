@@ -71,6 +71,28 @@ canvas{display:block;width:100%;height:100%;image-rendering:auto;touch-action:no
 .dots{display:flex;gap:4px}
 .dots i{width:18px;height:4px;background:rgba(143,200,236,.2);border-radius:2px}
 .dots i.on{background:var(--cyan)}
+.stagewrap{position:relative}
+.dlg{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:min(840px,calc(100% - 28px));background:rgba(7,10,19,.95);border:1.5px solid var(--rule-strong);border-radius:10px;padding:14px 18px 12px;display:grid;grid-template-columns:58px minmax(0,1fr);gap:14px;align-items:start;cursor:pointer;box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+.dlg.me{border-color:rgba(237,241,247,.55)}
+.dava{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:22px;color:#0B0F1C}
+.dlg.me .dava{font-family:var(--mono);font-size:12px;font-weight:600}
+.dmain{display:grid;gap:6px;min-width:0}
+.dhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.dnm{font-family:var(--display);font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.03em;color:var(--brass)}
+.dlg.me .dnm{color:var(--ink)}
+.dtag{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dtx{font-size:clamp(16px,2.1vw,19px);line-height:1.5;min-height:3em;margin:0}
+.dtx b{color:var(--brass);font-weight:600}
+.dlg.me .dtx{font-style:italic}
+.caret{display:inline-block;width:8px;height:1em;background:var(--cyan);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.dft{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);min-height:22px}
+.dnext{color:var(--cyan);letter-spacing:.06em}
+.dch{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+.dch .btn{padding:8px 12px;font-size:14px;display:inline-flex;gap:8px;align-items:center}
+.dch .kk{font-family:var(--mono);font-size:11px;border:1px solid currentColor;border-radius:3px;padding:0 5px;opacity:.8}
+@media (max-width:700px){.dlg{position:static;transform:none;width:auto;margin-top:10px;grid-template-columns:44px minmax(0,1fr)}.dava{width:44px;height:44px;font-size:17px}}
+@media (prefers-reduced-motion:reduce){.caret{animation:none}}
 .chat{display:grid;gap:12px}
 .line{display:flex;gap:10px;align-items:flex-start;max-width:100%}
 .line.me{flex-direction:row-reverse}
@@ -134,7 +156,10 @@ canvas{display:block;width:100%;height:100%;image-rendering:auto;touch-action:no
     <div class="brand">Operation <span>Moat</span></div>
     <div class="keys">Move <b>←</b><b>→</b> or <b>A</b><b>D</b> · Jump <b>Space</b> <b>W</b> · Talk / use <b>E</b> · Answers <b>1</b>–<b>4</b></div>
   </div>
-  <div class="stage"><canvas id="cv" width="960" height="544" aria-label="Operation Moat game screen"></canvas></div>
+  <div class="stagewrap">
+    <div class="stage"><canvas id="cv" width="960" height="544" aria-label="Operation Moat game screen"></canvas></div>
+    <div class="dlg" id="dlg" hidden role="dialog" aria-live="polite"></div>
+  </div>
   <div class="pad" aria-hidden="true">
     <div class="grp"><button data-k="l">◀</button><button data-k="r">▶</button></div>
     <div class="grp"><button class="e" data-k="e">Use</button><button class="j" data-k="j">Jump</button></div>
@@ -172,23 +197,19 @@ const CREW = [
      ["Vanguard discouraging investors from rapid buying and selling",1,"An activity choice that reinforces its low-cost variety position."]
     ]},
   aud:[
-   ["According to Porter, which of these is operational effectiveness rather than strategy?",["Adopting TQM and benchmarking to match industry best practice","IKEA's self-service, flat-pack model","Carmike Cinemas operating only in small towns","Neutrogena selling mainly through drugstores and dermatologists"],"OE means performing similar activities better. The other three are distinct positions built on tailored activities."],
-   ["Carmike Cinemas serving only towns with fewer than 200,000 people is Porter's example of:",["Access-based positioning","Variety-based positioning","Needs-based positioning","Operational effectiveness"],"Customers have similar needs, but reaching them takes a different set of activities: low-cost theatres, central systems, local marketing."],
-   ["Why did Continental Lite fail?",["It straddled: it added low-cost service while keeping conflicting full-service activities","Its aircraft were older than Southwest's","Regulators blocked its point-to-point routes","Southwest priced below cost to drive it out"],"Trade-offs between the two positions meant compromises on travel agents, frequent-flier rewards and gate times hurt both businesses."],
-   ["Which is NOT one of Grant's four common elements of successful strategies?",["A superior initial endowment of resources","Consistent, long-term goals","Profound understanding of the competitive environment","Effective implementation"],"Grant stresses that success seldom comes from superior initial resources. Objective appraisal of resources is the fourth element."],
-   ["Grant prefers a two-way internal/external split to SWOT because:",["Classifying factors as strengths or weaknesses, opportunities or threats is often arbitrary","SWOT ignores the external environment","SWOT cannot be used by not-for-profits","SWOT has been replaced by the five forces"],"Ibrahimovic was both a strength and a weakness; global warming is both a threat and an opportunity for carmakers."],
-   ["According to Mintzberg, a firm's realized strategy is:",["Largely emergent, with only 10 to 30% of intended strategy realized","The same as intended strategy when the firm plans well","Set entirely by the planning department","Unrelated to what managers intend"],"Realized strategy blends a little intended strategy with a lot of emergent adaptation. Grant calls the practical mix 'planned emergence'."],
-   ["Vanguard aligns every activity with low cost: no brokers, low portfolio turnover, bonuses tied to cost savings. This is:",["First-order fit (simple consistency)","Second-order fit (reinforcing activities)","Third-order fit (optimization of effort)","Operational effectiveness"],"First-order fit is consistency between each activity and the overall strategy."],
+   ["According to Porter, which of these is operational effectiveness rather than strategy?",["Adopting TQM and benchmarking to match industry best practice","A furniture seller's self-service, flat-pack model for young budget buyers","A cinema chain operating only in small towns","A skincare brand selling only through pharmacies and dermatologists"],"OE means performing similar activities better. The other three are distinct positions built on tailored activities."],
+   ["A cinema chain operates only in small towns, with cheaper theatres designed for them. Porter would call this:",["Access-based positioning","Variety-based positioning","Needs-based positioning","Operational effectiveness"],"Customers have similar needs, but reaching them takes a different set of activities: low-cost theatres, central systems, local marketing."],
+   ["A full-service airline launches a no-frills service but keeps its travel agents, meals and frequent-flier perks. Why is this likely to fail?",["It straddles two positions, and the conflicting activities hurt both","Its aircraft are older than its rivals'","Regulators will block its routes","Rivals will price below cost to drive it out"],"Trade-offs between the two positions meant compromises on travel agents, frequent-flier rewards and gate times hurt both businesses."],
+   ["A fund company makes every activity serve low cost: no brokers, low portfolio turnover, bonuses tied to cost savings. This is:",["First-order fit (simple consistency)","Second-order fit (reinforcing activities)","Third-order fit (optimization of effort)","Operational effectiveness"],"First-order fit is consistency between each activity and the overall strategy."],
    ["Corporate strategy answers ___; business strategy answers ___.",["Where to compete; how to compete","How to compete; where to compete","What to produce; whom to hire","Competing today; competing tomorrow"],"Corporate strategy sets scope. Business (competitive) strategy is about establishing competitive advantage in an industry."]
   ],
   heist:[
    ["Porter's productivity frontier is best described as:",["The maximum value a firm can deliver at a given cost using the best available practices","The industry's average cost and quality","The best performance the firm itself has achieved","The limit of market demand at current prices"],"The frontier shifts outward as best practice improves. OE moves a firm toward it; strategy is about where on it you choose to sit."],
    ["Which statement is true?",["Trade-offs are essential to strategy because they create the need for choice","Firms facing trade-offs cannot gain a sustainable competitive advantage","A good strategy removes every trade-off","Trade-offs arise only from brand image"],"Trade-offs deter straddlers and repositioners. They come from image, from activities themselves and from coordination limits."],
-   ["In Grant's view, strategic decisions are characterised by:",["Importance, significant commitment of resources, and being hard to reverse","Frequency, routine and delegation","Short time horizons and easy reversal","Being made only by the board"],"These three features separate strategy from tactics."],
-   ["'What we want to be' is the purpose of which statement, in Collis and Rukstad's scheme?",["Vision","Mission","Values","Strategy statement"],"Mission is why we exist, values are what we believe in, vision is what we want to be."],
+   ["Strategic decisions are characterised by:",["Importance, significant commitment of resources, and being hard to reverse","Frequency, routine and delegation","Short time horizons and easy reversal","Being made only by the board"],"These three features separate strategy from tactics."],
+   ["Among a firm's statements of purpose, which one says 'what we want to be'?",["Vision","Mission","Values","Strategy statement"],"Mission is why we exist, values are what we believe in, vision is what we want to be."],
    ["For Porter, the sustainability of a strategic position comes mainly from:",["The fit of the whole system of activities","One well-chosen core competence","Continuous benchmarking","Flexibility to respond to every market change"],"Competitors can copy single activities; matching an interlocking system is much less likely."],
-   ["Hamel and Prahalad's idea of strategic intent implies:",["A deliberate misfit between ambitions and current resources","Strict fit between strategy and existing resources","Detailed five-year forecasts","Avoiding stretch goals"],"Strategic intent embraces stretch and leverage, not only strategic fit."],
-   ["Intel's shift from memory chips to microprocessors, begun by plant and business-unit managers, illustrates:",["Emergent strategy later adopted by top management","Corporate planning based on forecasts","Straddling","Operational effectiveness"],"Grant uses Intel to show emergent processes can come before formal strategy."]
+   ["A company's move into a new product starts with decisions by plant managers and is only later adopted by top management. This illustrates:",["Emergent strategy later adopted by top management","Corporate planning based on forecasts","Straddling","Operational effectiveness"],"Grant uses Intel to show emergent processes can come before formal strategy."]
   ]},
 { id:"b", ini:"BK", crew:"The Bookkeeper", src:"Ch 2 · Goals, Values and Performance", role:"Decides whether the vault is worth the risk.",
   room:"The counting room", roomLine:"The ledgers are open. Read them right or the numbers lie to you.",
@@ -221,16 +242,14 @@ const CREW = [
    ["Which is NOT a perspective of the balanced scorecard?",["Supplier perspective","Customer perspective","Internal business perspective","Innovation and learning perspective"],"The four are financial, customer, internal business, and innovation and learning."],
    ["The value of a real option increases when:",["Uncertainty about the project increases","The investment cost (exercise price) rises","The time to expiry shortens","The project's value leaks away during the option period"],"Uncertainty and time both raise option value; a higher exercise price and value leakage lower it."],
    ["Your ROA trails a rival's but operating margins are equal. Where should the diagnosis go next?",["Asset utilisation: fixed-asset, inventory and receivables turnover","Advertising spend","The tax rate","Dividend policy"],"ROA = margin x turnover. With equal margins, the gap must be on the turnover branch."],
-   ["John Kay's principle of obliquity suggests firms should:",["Target the strategic drivers of profit rather than profit itself","Maximise quarterly profit","Ignore profit entirely","Tie every bonus to the share price"],"Direct profit targets often produce behaviour that undermines profit, as Boeing's experience showed."],
-   ["Grant's main objection to pursuing all stakeholders' interests is that:",["Performance becomes hard to measure and management hard to hold accountable","It always lowers profit","It is illegal outside continental Europe","It ignores customers"],"'Multiple objectives is no objective.' Governance becomes vague when every group's interests must be balanced."]
+   ["The main practical problem with asking managers to serve all stakeholders' interests is that:",["Performance becomes hard to measure and management hard to hold accountable","It always lowers profit","It is illegal outside continental Europe","It ignores customers"],"'Multiple objectives is no objective.' Governance becomes vague when every group's interests must be balanced."]
   ],
   heist:[
-   ["Diageo's use of EVA led it to:",["Shift advertising to fast-selling spirits because slow-maturing malts tied up costly capital","Increase investment in vintage cognac","Stop measuring divisional profit","Cut prices across all brands"],"Charging divisions for capital showed high-margin aged drinks were less profitable than believed."],
    ["Consumer surplus is:",["The difference between what customers are willing to pay and what they actually pay","Price minus unit cost","Employees' pay above their minimum","Taxes paid to government"],"The stronger the competition, the more value goes to customers as consumer surplus."],
-   ["Porter and Kramer's 'shared value' means:",["Creating economic value in a way that also expands value for society","Paying farmers a higher price for the same crop","Giving 2% of profit to charity","Sharing profits equally among stakeholders"],"Shared value expands the pool. Fair trade redistributes it."],
-   ["For a public company, Grant's best available forward-looking performance measure is:",["Stock market valuation","Return on sales","Return on equity","EBITDA"],"Market value is an imperfect but risk-adjusted estimate of the firm's future cash flows."],
-   ["Which of these is a growth option?",["3M's nanotechnology platform that can seed products across many businesses","A flexible line that can switch between car models","A sale-and-leaseback of aircraft","A share buyback"],"Platform investments, alliances and capabilities are growth options. A flexible line is a flexibility option."],
-   ["Which is NOT one of Grant's justifications for focusing on long-run profit?",["Profit maximization always matches the social good","Competition limits the scope for other goals","The threat of acquisition disciplines managers","Stakeholder interests converge over the long run"],"Grant acknowledges conflicts between profit and social good and discusses CSR for exactly that reason."],
+   ["'Shared value' means:",["Creating economic value in a way that also expands value for society","Paying farmers a higher price for the same crop","Giving 2% of profit to charity","Sharing profits equally among stakeholders"],"Shared value expands the pool. Fair trade redistributes it."],
+   ["For a listed company, the best available forward-looking performance measure is:",["Stock market valuation","Return on sales","Return on equity","EBITDA"],"Market value is an imperfect but risk-adjusted estimate of the firm's future cash flows."],
+   ["Which of these is a growth option?",["A platform technology that can seed products across many future businesses","A flexible line that can switch between car models","A sale-and-leaseback of aircraft","A share buyback"],"Platform investments, alliances and capabilities are growth options. A flexible line is a flexibility option."],
+   ["Which is NOT a reason for firms to focus on long-run profit?",["Profit maximization always matches the social good","Competition limits the scope for other goals","The threat of acquisition disciplines managers","Stakeholder interests converge over the long run"],"Grant acknowledges conflicts between profit and social good and discusses CSR for exactly that reason."],
    ["Which statement is true?",["Economic profit is the surplus available after all inputs, including capital, are paid for","Economic profit ignores the cost of capital","Accounting profit always exceeds cash flow","Free cash flow is operating profit plus capital expenditure"],"Economic profit is also called economic rent. Free cash flow is operating cash flow minus capital investment."]
   ]},
 { id:"s", ini:"SC", crew:"The Scout", src:"Ch 3 · Porter, Five Competitive Forces", role:"Cases the building and reads every wall.",
@@ -264,9 +283,9 @@ const CREW = [
    ["High exit barriers in an industry lead to:",["Intense rivalry","Low industry concentration","High entry barriers","High industry attractiveness"],"Capacity that cannot leave keeps prices down as weak firms hang on."],
    ["Which does NOT increase supplier power?",["The supplier depends heavily on the industry for its revenue","Suppliers are more concentrated than the industry","Inputs are differentiated","Suppliers can credibly integrate forward"],"A supplier that depends on an industry will price reasonably to protect it."],
    ["A contestable market is one where:",["There are no sunk costs, so the threat of hit-and-run entry keeps prices competitive","There are many firms","A single firm is protected by a patent","Government sets prices"],"Contestability depends on free entry and exit, not on the number of firms."],
-   ["In Porter's 2008 article, government is:",["Not a sixth force; its policies should be analysed through their effect on the five forces","A sixth force that always lowers profitability","A sixth force that always raises profitability","Irrelevant to industry structure"],"Patents raise entry barriers; pro-union policies raise supplier power. Porter treats complements the same way."],
+   ["In Porter's five forces article, government is:",["Not a sixth force; its policies should be analysed through their effect on the five forces","A sixth force that always lowers profitability","A sixth force that always raises profitability","Irrelevant to industry structure"],"Patents raise entry barriers; pro-union policies raise supplier power. Porter treats complements the same way."],
    ["Refrigerator, microwave and dishwasher makers are treated as one domestic appliance industry because:",["They face similar five forces: similar suppliers, customers and value chains, so supply-side substitution applies","Customers treat the products as substitutes","Government classifies them together","Most firms make all three"],"Consumers don't swap a fridge for a dishwasher, but manufacturers can switch plants and channels."],
-   ["Paccar serving owner-operator truck drivers with premium custom trucks illustrates:",["Positioning the company where the competitive forces are weakest","Reshaping industry structure for everyone","Expanding the industry profit pool","Exploiting a change in technology"],"Owner-operators have little buyer power and are less price sensitive. Paccar earns a 10% premium."],
+   ["A truck maker targets independent owner-drivers who value comfort and are less price sensitive. This illustrates:",["Positioning the company where the competitive forces are weakest","Reshaping industry structure for everyone","Expanding the industry profit pool","Exploiting a change in technology"],"Owner-drivers are less price sensitive, so buyer power is weak in that segment."],
    ["Key success factors are identified by asking:",["What customers want and how a firm survives the competition","Which firm has the largest assets","What the government wants","Which segment is growing fastest"],"Grant's framework combines analysis of demand with analysis of competition."]
   ],
   heist:[
@@ -304,21 +323,20 @@ const CREW = [
      ["Exxon and Shell run joint ventures while competing for leadership",0,"Co-opetition."]
     ]},
   aud:[
-   ["In the Coca-Cola vs Pepsi advertising game, the Nash equilibrium is:",["Both choose big budgets","Both choose small budgets","One big, one small","There is no equilibrium"],"Each fears the other going big, so both do. Neither can gain by changing alone."],
+   ["Two rivals each pick a big or small ad budget. Both would earn more if both went small, but each fears the other going big. The Nash equilibrium is:",["Both choose big budgets","Both choose small budgets","One big, one small","There is no equilibrium"],"Each fears the other going big, so both do. Neither can gain by changing alone."],
    ["For a deterrent threat to work, it must above all be:",["Credible","Secret","Made by the largest firm","Announced publicly"],"If carrying it out would hurt the threatener more, rivals will not believe it."],
-   ["Cortés destroying his ships is an example of:",["Commitment","Signaling through misinformation","Cooperation","Changing the structure of the game"],"Commitment binds a player to a course of action by removing alternatives."],
+   ["A general burns his own ships after landing, so retreat is impossible. In game theory this is:",["Commitment","Signaling through misinformation","Cooperation","Changing the structure of the game"],"Commitment binds a player to a course of action by removing alternatives."],
    ["Which is NOT part of Porter's competitor analysis framework?",["The competitor's share price volatility","Its current strategy","Its objectives","Its assumptions about the industry"],"The fourth element is its resources and capabilities."],
    ["Barriers that protect one segment from firms in other segments of the same industry are called:",["Mobility barriers","Entry barriers","Exit barriers","Switching costs"],"Entry barriers protect the whole industry; mobility barriers protect segments or groups."],
    ["Strategic group analysis is most useful for:",["Understanding strategic positioning and patterns of competition","Predicting large, lasting profit differences between groups","Measuring industry concentration","Identifying collusion"],"Research finds limited evidence of systematic profit differences between groups."],
-   ["Studies of interfirm profit differences find that industry factors explain:",["Less than 20% of the variation","About half","About 80%","None of it"],"Differences within industries are larger than those between industries."],
-   ["According to Jacobides, a firm captures more value in its ecosystem by:",["Controlling a bottleneck and becoming irreplaceable","Supplying a small, easily substituted component","Avoiding contact with end customers","Spreading into every activity equally"],"System integrators and guardians of quality tend to win the value battle."]
+   ["In a business ecosystem, a firm captures more value by:",["Controlling a bottleneck and becoming irreplaceable","Supplying a small, easily substituted component","Avoiding contact with end customers","Spreading into every activity equally"],"System integrators and guardians of quality tend to win the value battle."]
   ],
   heist:[
    ["Co-opetition refers to:",["Business relationships that combine competition and cooperation","A merger of rivals","Price-fixing","Ignoring competitors"],"Brandenburger and Nalebuff: no relationship is purely competitive or purely cooperative."],
    ["Why is threatening a price war often a weak deterrent to entry?",["It would damage the incumbent more than the entrant, so it lacks credibility","Price wars are illegal","Entrants never consider incumbents","It is too cheap to carry out"],"Investing in excess capacity is usually a more credible deterrent."],
    ["In the value capture model, the upper limit on value a firm can capture is:",["The value it adds to its current network","Its market capitalization","Its revenue","The value it could add to another network"],"The value it could add elsewhere is the lower limit."],
    ["A key limitation of game theory in strategy is that:",["Realistic models often give no equilibrium or many, and results are sensitive to assumptions","It cannot handle cooperation","It ignores rivals' decisions","It works only for monopolies"],"It is better at explaining past competitive situations than predicting new ones."],
-   ["Harley-Davidson's 1966 dismissal of lightweight Japanese bikes illustrates:",["Blindspots created by industry recipes about competitors' assumptions","A signaling strategy","Mobility barriers","Hypercompetition"],"Shared beliefs about the industry kept incumbents from seeing the threat."],
+   ["Established motorcycle makers dismissed small bikes from new foreign rivals because 'real riders want big bikes'. This illustrates:",["Blindspots created by shared assumptions about the industry","A signaling strategy","Mobility barriers","Hypercompetition"],"Shared beliefs about the industry kept incumbents from seeing the threat."],
    ["Which statement is true?",["The purpose of segmentation analysis is to find attractive segments, select strategies for them and decide how many to serve","Firms must compete in many segments to gain advantage","A strategic group is the set of firms in one segment","Firms in a strategic group engage in tacit collusion"],"Segment scope depends on whether KSFs are similar and costs can be shared."],
    ["A 'hard' commitment is one that:",["Commits a firm to aggressive competition","Signals a desire to avoid competition, such as announced profit targets","Can be reversed at no cost","Is kept secret from rivals"],"Soft commitments moderate competition; hard ones make aggression credible."]
   ]},
@@ -350,20 +368,18 @@ const CREW = [
     ]},
   aud:[
    ["Applying the inimitability, durability and appropriability tests, which resource is most valuable?",["A brand built over decades as the industry pioneer","A technology licensed from a foreign firm for three years","A star marketing head hired last month","A creative team working on contract"],"The brand is path dependent, long lasting and owned by the firm. The others expire or can walk out."],
-   ["Gerber's brand is hard to copy mainly because of:",["Path dependency","Physical uniqueness","Economic deterrence","Causal ambiguity"],"Consumer trust built over years cannot be bought instantly, even with huge advertising budgets."],
-   ["Rivals cannot pin down what makes Southwest's culture work, so they cannot copy it. This is:",["Causal ambiguity","Path dependency","Economic deterrence","Durability"],"Causally ambiguous resources are often capabilities embedded in social interactions."],
+   ["A baby-food brand has built decades of parental trust that rivals can't buy even with huge ad budgets. This is hard to copy mainly because of:",["Path dependency","Physical uniqueness","Economic deterrence","Causal ambiguity"],"Consumer trust built over years cannot be bought instantly, even with huge advertising budgets."],
+   ["Rivals can't pin down what makes a competitor's company culture work, so they can't copy it. This is:",["Causal ambiguity","Path dependency","Economic deterrence","Durability"],"Causally ambiguous resources are often capabilities embedded in social interactions."],
    ["A firm builds the first float-glass plant in a small country and rivals choose not to follow. This is:",["Economic deterrence","Causal ambiguity","Appropriability","Substitutability"],"The market can support only one plant of efficient scale, and the investment signals commitment."],
-   ["The major airlines defeated People Express by using a different resource: reservation systems and yield management. Which test did People Express's resources fail?",["Substitutability","Inimitability","Durability","Appropriability"],"Its no-frills system was hard to copy but could be trumped by a different resource."],
+   ["A no-frills airline's system was too hard to copy, but big airlines matched its fares using a different resource: reservation systems and yield management. Which test did the no-frills airline's resources fail?",["Substitutability","Inimitability","Durability","Appropriability"],"Its no-frills system was hard to copy but could be trumped by a different resource."],
    ["Collis and Montgomery prefer 'distinctive competence' to 'core competence' because:",["A competence must be judged against competitors, not just against the firm's other activities","Core competence ignores customers","Distinctive competence is easier to measure","Core competence applies only to manufacturing"],"Core competence has too often become a feel-good exercise that no firm fails."],
-   ["Masco's experience with its metalworking competence teaches that:",["Investing in competences without analysing industry attractiveness can yield low returns","Metalworking is not a real capability","Diversification always fails","Resources matter more than industry structure"],"Masco entered industries with price-sensitive buyers, low entry barriers and powerful suppliers."],
    ["Resources that generate a temporary competitive advantage are:",["Valuable and rare but not costly to imitate","Valuable, rare and costly to imitate","Valuable but neither rare nor costly to imitate","Not valuable but rare"],"Rivals soon copy them. Sustained advantage needs imitation to be costly too."]
   ],
   heist:[
    ["Which property makes a resource LESS strategically valuable?",["It depreciates quickly","It is hard for rivals to copy","The firm captures most of the value it creates","It is superior to rivals' similar resources"],"Durability is one of the five tests."],
-   ["LBO firms struggled to keep profits from their deal networks because those networks:",["Resided in individuals who could leave","Were easily imitated by banks","Depreciated within months","Were substituted by online platforms"],"This is a failure of appropriability."],
-   ["Marks & Spencer's repeated failures in North America show that managers often:",["Overestimate how well context-specific resources transfer to new markets","Underinvest in their home market","Choose industries with low entry barriers","Rely too much on fungible resources"],"Path dependency and causal ambiguity make resources hard for the owner to replicate too."],
+   ["A buyout firm's key resource is its partners' network of deal relationships. It struggles to keep the profits because the network:",["Resided in individuals who could leave","Were easily imitated by banks","Depreciated within months","Were substituted by online platforms"],"This is a failure of appropriability."],
    ["Highly fungible resources such as cash:",["Transfer easily across markets but rarely provide competitive advantage","Are the main source of competitive advantage","Cannot be moved across businesses","Are always path dependent"],"Specialized resources give advantage but lose value outside their setting."],
-   ["Intel adding the 'Intel Inside' brand to its technology base is an example of:",["Upgrading resources by adding a new one","Leveraging a fungible resource","Economic deterrence","Straddling"],"Other routes: moving to alternative resources or into more attractive industries."],
+   ["A chip maker adds a consumer-facing brand on top of its technology. This is an example of:",["Upgrading resources by adding a new one","Leveraging a fungible resource","Economic deterrence","Straddling"],"Other routes: moving to alternative resources or into more attractive industries."],
    ["According to Collis and Montgomery, the value of a resource is determined by:",["The interplay of demand, scarcity and appropriability","Its book value","Its cost to acquire","Management's internal assessment"],"The five tests translate these market forces into practical checks."],
    ["In the fast-food industry, site-locating skill and real estate are, respectively:",["A capability and a resource","A resource and a capability","A competence and a trade-off","An opportunity and a threat"],"Resources are what the firm owns; capabilities are what it can do with them."]
   ]},
@@ -400,11 +416,11 @@ const CREW = [
    ["Institutional isomorphism causes inertia because firms:",["Imitate peers to gain legitimacy, locking in similar strategies and structures","Protect their political power","Stop searching once results are satisfactory","Have routines that are hard to change"],"The other options describe political structures, satisficing and routines."],
    ["For Swiss mechanical watchmakers, the quartz watch was:",["Competence-destroying","Competence-enhancing","A sustaining innovation","A component innovation only"],"It made their precision-engineering capabilities largely irrelevant."],
    ["Structural ambidexterity means:",["Creating separate units for exploration apart from core operations","The same people explore and exploit","Alternating between centralization and decentralization","Merging all R&D into one department"],"IBM developing its PC in Florida, far from headquarters, is the classic example."],
-   ["The main value of Shell's scenario analysis is:",["Surfacing assumptions and testing strategies against different possible futures","Forecasting the oil price precisely","Replacing strategic planning","Choosing the single most likely future"],"Shell insists its scenarios are not forecasts."]
+   ["The main value of scenario analysis is:",["Surfacing assumptions and testing strategies against different possible futures","Forecasting the oil price precisely","Replacing strategic planning","Choosing the single most likely future"],"Scenarios are not forecasts. They help you test strategies against different futures."]
   ],
   heist:[
-   ["A disruptive technology, in Christensen's sense:",["Initially underperforms on attributes mainstream customers value, then improves and displaces incumbents","Improves the performance attributes existing customers value","Is always adopted first by the industry leader","Only affects component suppliers"],"Leading customers resist it at first, which is why incumbents miss it."],
-   ["Architectural innovations are especially hard for incumbents because they:",["Require reconfiguring how components link together, i.e. the whole system","Involve only one new component","Are always patented by rivals","Occur only in service industries"],"Boeing gained leadership by redesigning aircraft around the jet engine."],
+   ["A disruptive technology:",["Initially underperforms on attributes mainstream customers value, then improves and displaces incumbents","Improves the performance attributes existing customers value","Is always adopted first by the industry leader","Only affects component suppliers"],"Leading customers resist it at first, which is why incumbents miss it."],
+   ["Architectural innovations are especially hard for incumbents because they:",["Require reconfiguring how components link together, i.e. the whole system","Involve only one new component","Are always patented by rivals","Occur only in service industries"],"Incumbents know the components well but are organised around the old way they fit together."],
    ["Punctuated equilibrium describes organizations that:",["Stay stable for long periods, then undergo radical, comprehensive change","Change a little every year","Never change","Change only through acquisitions"],"Complementarities make piecemeal change hard, so misfit builds until a crisis forces change."],
    ["Dynamic capabilities are:",["Higher-order capabilities to sense, seize and reconfigure resources and competences","The fastest operational routines","Capabilities that depreciate quickly","Resources bought on the market"],"Teece: the ability to integrate, build and reconfigure competences for changing environments."],
    ["Tacit knowledge is:",["Know-how revealed through performance and transferred mainly by practice","Facts and instructions that can be written down","Easily copied by rivals","Protected mainly by patents"],"Explicit knowledge behaves like a public good; tacit knowledge doesn't."],
@@ -415,17 +431,18 @@ const CREW = [
 
 
 
+
 /* =================================================================
    PAST-PAPER BANK: questions adapted from C&S Quiz 1 (2020, 2021, 2023, 2024),
    limited to what's on this year's syllabus. Format: [q, [correct, wrong x3], explanation, source]
    ================================================================= */
 const PAST = {
 m:[
- ["In a highly competitive industry, which practice is most likely to lead to inferior performance?",["Trying to be everything to everybody by combining different competitive strategies","Focusing on creating value for customers rather than destroying rivals","Choosing a distinct strategic position in the industry","Widening the gap between value created and cost"],"Porter: straddling several positions creates trade-off penalties, as Continental Lite found.","2020"],
+ ["In a highly competitive industry, which practice is most likely to lead to inferior performance?",["Trying to be everything to everybody by combining different competitive strategies","Focusing on creating value for customers rather than destroying rivals","Choosing a distinct strategic position in the industry","Widening the gap between value created and cost"],"Straddling several positions creates trade-off penalties in all of them.","2020"],
  ["Which statement about strategy is NOT true?",["Operational effectiveness and competitive benchmarking should be treated as strategy","Grandiose statements of desire, on their own, are not strategy","Strategy is as much about deciding what not to do as what to do","Strategy is about creating superior value while containing the cost of creating it"],"OE is necessary but not sufficient. Benchmarking leads to competitive convergence.","2020"],
  ["What is the strongest reason a company cannot be 'all things to all people'?",["There are trade-offs involved in serving every need","People have differentiated choices","Companies cannot improve productivity infinitely","Vision, mission and goals must be sharply defined"],"Trade-offs make activities incompatible: more of one thing means less of another.","2024"],
  ["In 'What Is Strategy?', companies may not see a trade-off between improving quality and reducing cost when they are:",["Far from the productivity frontier","At the productivity frontier","Ahead of competitors in operational effectiveness","In a fast-growing industry"],"Simultaneous gains are possible only when a firm starts far behind the frontier. At the frontier the trade-off is real.","2024"],
- ["In 'What Is Strategy?', which statement is TRUE?",["Variety-, needs- and access-based positioning can each be pursued through either a cost or a differentiation strategy","Variety-based positioning works only with differentiation","Needs-based positioning works only with a cost strategy","Access-based positioning works only with a cost strategy"],"IKEA is needs-based and cost-focused, Southwest variety-based and cost-focused, Neutrogena a focused differentiator.","2024"],
+ ["In 'What Is Strategy?', which statement is TRUE?",["Variety-, needs- and access-based positioning can each be pursued through either a cost or a differentiation strategy","Variety-based positioning works only with differentiation","Needs-based positioning works only with a cost strategy","Access-based positioning works only with a cost strategy"],"The type of position (variety, needs, access) is separate from whether you compete on cost or differentiation.","2024"],
  ["In 'What Is Strategy?', strategic fit refers to:",["Consistency among a firm's activities, reinforcing each other toward the chosen position","The firm's alignment with its external environment alone","Matching competitors' best practices","Agreement between the vision and mission statements"],"Porter's fit is among activities: first-order consistency, second-order reinforcement, third-order optimization of effort. Grant's broader 'strategic fit' also includes the environment.","2024"],
  ["When change opens new positions in an industry, Porter says new entrants often take them before incumbents because:",["Incumbents face trade-offs with their existing activities and may overlook the new position","Incumbents always face high exit barriers","Entrants always have more capital","Regulators favour new entrants"],"Newcomers are unencumbered by history and face no trade-offs with existing activities.","2024"],
  ["Which statement best describes strategy?",["A set of goal-directed actions a firm takes to gain and sustain superior performance","Launching a celebrity marketing campaign for new products","Operational effectiveness and production efficiency","Switching to home delivery just during a lockdown"],"Campaigns and temporary moves are tactics; OE is not strategy.","2021"],
@@ -461,7 +478,6 @@ s:[
  ["Which statement about industry structure is true?",["A consolidated industry tends to be more profitable than a fragmented one","More competitors generally means higher profitability","Industry structures are stable, not dynamic","A few large competitors raise supplier and buyer power"],"Concentration usually mutes price competition.","2020"],
  ["Which is FALSE about the threat of substitutes and switching costs?",["Banks bundling savings and demat accounts decrease customers' switching costs","Customers may switch to a better robotic roti maker even at a higher price","Mobile number portability can cut telecom profits by lowering switching costs","Travel-aggregator users switch airlines more readily than direct bookers"],"Bundling raises switching costs.","2020"],
  ["Which is FALSE about complements?",["Complements decrease customers' switching costs","They may be offered by the same firm or others","They add value when used together","They increase demand for the primary product"],"Complements tend to raise switching costs (think printer and ink).","2020"],
- ["Which statement about environmental (PESTEL) factors is FALSE?",["A single IT firm can materially change the country's unemployment rate by hiring more","Ride-sharing firms may see ICT changes as threats or opportunities","Pharma firms can shape political factors through lobbying","Beverage firms may add low-calorie options due to sociocultural shifts"],"Individual firms rarely move macroeconomic variables.","2020"],
  ["The prevalence of only a few music streaming companies is best explained by:",["Demand-side benefits of scale","Supply-side benefits of scale","Heavy industry regulation","Threat of deterrence"],"Network effects make users and artists gravitate to the biggest platforms.","2024"],
  ["___ relates unit cost to the volume produced at a point in time; ___ relates unit cost to cumulative production.",["Economies of scale; experience curve","Experience curve; economies of scale","Economies of scale; competitive advantage","Competitive advantage; economies of scale"],"Both are cost-based sources of incumbent advantage.","2024"]
 ],
@@ -470,14 +486,13 @@ i:[
  ["Relative to firm-level factors, industry factors account for a ___ share of interfirm profit differences.",["Smaller","Larger","Equal","Undeterminable"],"Differences within industries are larger than those between them.","2024"]
 ],
 q:[
- ["Collis and Montgomery say a common mistake is investing in core competencies without:",["Conducting an industry analysis","Determining how imitable they are","Having a dominant design","Having a strong substitute"],"Masco's metalworking competence earned low returns in structurally poor industries.","2024"],
+ ["Collis and Montgomery say a common mistake is investing in core competencies without:",["Conducting an industry analysis","Determining how imitable they are","Having a dominant design","Having a strong substitute"],"A great competence can still earn low returns in a structurally unattractive industry.","2024"],
  ["For Spotify, the content library and content production are, respectively, a:",["Resource; capability","Capability; resource","Strength; opportunity","Competence; trade-off"],"The library is owned; producing content is what the firm can do.","2021"],
  ["For an airline, superior customer service and premium routes are, respectively, a:",["Capability; resource","Resource; capability","Opportunity; threat","Competence; complement"],"Service is something the firm does; routes (slots) are owned.","2021"],
  ["Which is NOT a resource for an organization?",["Industry rivals","Assets and capabilities","Firm knowledge","Organizational processes"],"Rivals are part of the external environment.","2021"],
  ["A pharma incumbent's product patent is an example of a ___ resource.",["Inimitable","Substitutable","Freely tradable","Fast-depreciating"],"Patents are physically unique in Collis and Montgomery's terms.","2021"],
  ["The level of analysis for the five forces and the resource-based view is, respectively:",["Industry; firm","Firm; industry","Industry; industry","Firm; firm"],"RBV looks inside the firm, the five forces at the industry.","2021"],
- ["Resource heterogeneity means that bundles of resources, capabilities and competencies:",["Differ across firms","Are the same across firms","Are mostly the same across firms","Differ only temporarily"],"No two firms have the same history, so resources differ.","2020"],
- ["Under VRIO, a firm gains competitive advantage from resources that are ___ and captured by an organized firm.",["Valuable, rare, costly to imitate","Valuable, refined, costly to introduce","Varied, rare, costly to imitate","Varied, refined, costly to introduce"],"Barney's VRIO parallels Collis and Montgomery's tests.","2020"],
+ ["Under VRIO, a firm gains competitive advantage from resources that are ___ and captured by an organized firm.",["Valuable, rare, costly to imitate","Valuable, refined, costly to introduce","Varied, rare, costly to imitate","Varied, refined, costly to introduce"],"VRIO: valuable, rare, costly to imitate, and organized to capture the value.","2020"],
  ["Google's AI edge comes from years of accumulated user data. Which best explains why it is hard to imitate?",["Path dependency","Deep pockets","Causal ambiguity","Economic deterrence"],"Built over time and hard to accelerate.","2023"]
 ],
 t:[
@@ -487,6 +502,292 @@ t:[
 ]
 };
 CREW.forEach(c=>{ c.past = (PAST[c.id]||[]); });
+
+
+/* =================================================================
+   LESSON DIALOGUE: one line per text box. ">" = you (the rookie); otherwise the thief.
+   **word** = highlighted key term. Every question in the game is answerable from these lines.
+   ================================================================= */
+const INTRO = {
+ m:["Uhm. So you're the rookie planning the Suchir job.","Essentially, I don't join anyone I haven't taught myself. What I mean to say is... sit. Ask."],
+ b:["Uhm, you want the numbers guy? Okay.","Essentially, a job is only worth it if the value is real. What I mean to say is, ask me about value."],
+ s:["Uhm... you're the one casing Suchir's shop?","Essentially, before any job, I read the whole street. What I mean to say is, I'll teach you to case an industry."],
+ i:["Uhm, keep your voice down. The guards talk to me.","Essentially, I know how rivals think. What I mean to say is, ask, and I'll tell you how they'll move."],
+ q:["Uhm, you want my gear? Everyone wants my gear.","Essentially, gear only matters if nobody else can get it. What I mean to say is, let me explain."],
+ t:["Uhm. You're late. Timing is everything, rookie.","Essentially, every market ages. What I mean to say is, learn when to strike."]
+};
+const SCRIPT = {
+m:[
+ {t:"What winners share", ask:"Why do some people win so big? Talent? Money?", l:[
+  "Uhm, neither, really. Essentially, winners rarely start with the best resources.",
+  "What I mean to say is, successful strategies share **four things**.",
+  "One: **simple, consistent, long-term goals**.",
+  "Two: **deep understanding of the competitive environment**.",
+  "Three: **objective appraisal of your resources**. Four: **effective implementation**.",
+  "Uhm, exam trap. 'A superior initial endowment of resources' is **not** on the list."]},
+ {t:"The basic framework", ask:"How should I picture a strategy?", l:[
+  "Essentially, strategy is the **link between the firm and its industry environment**.",
+  "Firm side: goals, resources, structure. Industry side: competitors, customers, suppliers.",
+  "Uhm, a good strategy fits both sides. That's **strategic fit**.",
+  "And SWOT? What I mean to say is, the labels are arbitrary.",
+  "**A strength can also be a weakness. An opportunity can also be a threat.**",
+  "So just split things into **internal** and **external**. Essentially, simpler."]},
+ {t:"Strategy vs tactics", ask:"What's the difference between strategy and tactics?", l:[
+  "Uhm, strategic decisions are **important**, need **big resource commitments**, and are **hard to reverse**.",
+  "Tactics are small moves. Essentially, a celebrity ad campaign is a tactic.",
+  "Strategy itself? **A set of goal-directed actions to gain and sustain superior performance.**",
+  "**Corporate strategy** answers **where to compete**. **Business strategy** answers **how to compete**.",
+  "What I mean to say is, you earn more by being in an **attractive industry**, or by having a **competitive advantage** in it.",
+  "Uhm, and advantage means beating rivals. In a protected monopoly there's no rival, so you can't really judge it."]},
+ {t:"Why have a strategy", ask:"Why bother with strategy? Can't I just react?", l:[
+  "Uhm, nobody can calculate every move. Essentially, strategy **simplifies decisions**, **coordinates** the crew and sets a **target**.",
+  "Firms write it down. **Mission**: why we exist. **Values**: what we believe.",
+  "**Vision**: what we want to be. **Strategy statement**: objectives, scope and advantage.",
+  "What I mean to say is, don't trust the words. Check where they actually spend money."]},
+ {t:"Plans vs reality", ask:"Do plans ever go the way they're written?", l:[
+  "Uhm, rarely. **Intended strategy** is the plan.",
+  "**Emergent strategy** comes from people reacting on the ground.",
+  "Essentially, **realized strategy** mixes both, and it's mostly emergent.",
+  "Like a company whose move into a new product began with plant managers. Top management adopted it later.",
+  "What I mean to say is, the answer is **planned emergence**. Set a direction, let people adapt."]},
+ {t:"Better is not different", ask:"If I'm faster and cheaper than everyone, isn't that a strategy?", l:[
+  "Uhm, no. That's **operational effectiveness**: doing the **same things better** than rivals.",
+  "TQM, benchmarking, outsourcing. Essentially, necessary, but **not strategy**.",
+  "**Strategy** means doing **different things**, or the same things **differently**.",
+  "Best practice spreads fast. Everyone moves toward the **productivity frontier**.",
+  "That's the **most value you can deliver at a given cost** using the best practices around.",
+  "What I mean to say is, everyone improves, nobody gets ahead. Benchmarking makes rivals look alike.",
+  "Uhm, one more. Far **behind** the frontier you can improve quality and cost together. **At** the frontier, you must trade off."]},
+ {t:"Three kinds of position", ask:"How do I pick a position that's really mine?", l:[
+  "Uhm, three ways. **Variety-based**: a narrow set of products. Like a shop that only does oil changes.",
+  "**Needs-based**: most needs of one customer group. Like flat-pack furniture for young budget buyers.",
+  "**Access-based**: reaching customers in a different way. Like a cinema chain only in small towns.",
+  "Essentially, any of the three works with a **cost** strategy or a **differentiation** strategy.",
+  "What I mean to say is, each position needs its **own tailored activities**."]},
+ {t:"Trade-offs and fit", ask:"What stops someone copying my position?", l:[
+  "Uhm, **trade-offs**. More of one thing means less of another.",
+  "Essentially, that's why you **can't be all things to all people**.",
+  "Straddle two positions, like a no-frills airline that keeps full service, and the conflicts hurt both.",
+  "So strategy is **choosing what not to do**.",
+  "Second shield: **fit**. **First-order**: every activity is consistent with the strategy.",
+  "**Second-order**: activities reinforce each other. **Third-order**: effort is optimized across them.",
+  "What I mean to say is, rivals can copy one activity. Copying the **whole system** is nearly impossible.",
+  "Uhm, and when a new position opens up, newcomers often take it. Incumbents face **trade-offs with what they already do**."]}
+],
+b:[
+ {t:"What value is", ask:"Isn't value just the profit I make?", l:[
+  "Uhm, no. **Value created = what customers are willing to pay − the real cost of production.**",
+  "Customers keep **consumer surplus**: what they'd pay minus what they do pay.",
+  "The firm keeps **producer surplus**. Essentially, total value = consumer surplus + producer surplus.",
+  "What I mean to say is, if **price is the only basis of competition**, new value goes straight to **customers**."]},
+ {t:"Whose value", ask:"Whose value am I chasing, the owners' or everyone's?", l:[
+  "Uhm, the stakeholder view says serve everyone: owners, staff, customers, communities.",
+  "Nice idea. But essentially, with many goals, **performance is hard to measure and managers hard to hold accountable**.",
+  "So the working goal is **long-run profit**. Why? **Competition**, the **threat of takeover**, and interests **converge** over time.",
+  "What I mean to say is, profit doesn't **always** match the social good. That's why CSR exists.",
+  "Uhm, and still try to understand how stakeholders relate to each other, even when it's messy."]},
+ {t:"Which profit", ask:"Profit is profit, right?", l:[
+  "Uhm, no. **Accounting profit** ignores the cost of the owners' capital.",
+  "**Economic profit = operating profit − capital employed × cost of capital.**",
+  "Essentially, what's left after **all inputs, including capital**, are paid.",
+  "What I mean to say is, a firm can show accounting profit and still destroy value."]},
+ {t:"What a firm is worth", ask:"How do I put one number on the whole firm?", l:[
+  "**Enterprise value = market value of equity + market value of debt.**",
+  "Essentially, it's the present value of future free cash flows.",
+  "Uhm, for a listed company, the **stock market value** is the best forward-looking measure we have."]},
+ {t:"Reading performance", ask:"How do I tell if a firm is doing well, and why?", l:[
+  "Uhm, look back with ratios: return on capital, equity, assets. Compare over time and against rivals.",
+  "Then split it. **Return on assets = margin × asset turnover.**",
+  "Margin side: cost of goods, overheads, depreciation. Turnover side: fixed assets, inventory, receivables.",
+  "What I mean to say is, same margins but lower return? Look at **asset turnover**."]},
+ {t:"Setting targets", ask:"How should I set targets for the crew?", l:[
+  "Uhm, cascade that ratio tree down to each team.",
+  "Or a **balanced scorecard**. Four views: **financial, customer, internal business, innovation and learning**.",
+  "Essentially, there's **no supplier view**. Classic trap.",
+  "What I mean to say is, chasing profit directly can backfire. Target what **drives** profit."]},
+ {t:"Values and CSR", ask:"Do values and CSR have anything to do with profit?", l:[
+  "Uhm, one view: a firm's only duty is profit within the rules. Another: firms are social entities.",
+  "The middle ground: CSR helps through **sustainability, reputation, and licence to operate**.",
+  "Essentially, **shared value** = creating economic value in a way that **also creates value for society**.",
+  "What I mean to say is, grow the pie. Don't just split it differently."]},
+ {t:"Small bets", ask:"Why pay for small bets that might never pay off?", l:[
+  "Uhm, flexibility is worth money when the future is uncertain.",
+  "Essentially, option value **rises with uncertainty** and **with time**. It **falls** if the investment cost rises.",
+  "**Growth options**: small bets that open future businesses. Like a platform technology.",
+  "**Flexibility options**: designs that can switch. Like a flexible production line.",
+  "What I mean to say is, staged projects let you continue, change, wait or quit."]}
+],
+s:[
+ {t:"Where to start", ask:"Where do I even start when I case an industry?", l:[
+  "Uhm, don't scan everything. Essentially, focus on **customers, suppliers and competitors**.",
+  "The five forces explain an industry's **average profitability**.",
+  "Not why one firm beats another. What I mean to say is, it's an **industry-level** tool."]},
+ {t:"The five forces", ask:"What exactly are the five forces?", l:[
+  "Across: **substitutes, new entrants, rivalry**. Up and down: **buyer power, supplier power**.",
+  "Essentially, profits are highest when **all five are weak**.",
+  "**Substitutes** put a **ceiling on prices**. They bite when they offer better value and switching is cheap.",
+  "Uhm, and it's the **threat** of entry, not actual entry, that holds profits down.",
+  "What I mean to say is, a shift in structure can **raise or lower** profits. Either way."]},
+ {t:"Keeping newcomers out", ask:"What keeps newcomers out of a juicy market?", l:[
+  "Uhm, **capital requirements**. And **economies of scale**.",
+  "If efficient scale is **large relative to demand**, entrants come in small and costly, or big with empty capacity.",
+  "**Demand-side scale**, network effects: users flock to the biggest network. That's why only a few streaming apps survive.",
+  "Essentially: **scale** is unit cost vs volume **right now**. The **experience curve** is unit cost vs **cumulative** output.",
+  "Also **brand, distribution access, government policy, patents**, and **expected retaliation**.",
+  "What I mean to say is, barriers are relative. A big firm from another industry jumps barriers that stop start-ups.",
+  "Uhm, **slow growth is not an entry barrier**. And cheap, widely available inputs **lower** barriers.",
+  "A **contestable market** has no sunk costs, so the threat of hit-and-run entry keeps prices low."]},
+ {t:"Ugly rivalry", ask:"When does competition between existing players get ugly?", l:[
+  "Uhm, many similar rivals. **Undifferentiated products**. Little customer loyalty.",
+  "**Excess capacity** and **slow growth**. Essentially, everyone fights for share.",
+  "**High exit barriers**: losers can't leave, so rivalry stays **intense**.",
+  "**High fixed costs, low marginal costs**: you fill seats at almost any price.",
+  "What I mean to say is, a **consolidated** industry is usually more profitable than a **fragmented** one.",
+  "Uhm, and if incumbents meet an entrant with price cuts and extra spending, **industry profit falls**."]},
+ {t:"Buyers and suppliers", ask:"How do I know who holds power, buyers or suppliers?", l:[
+  "Buyer power = **price sensitivity** × **bargaining leverage**.",
+  "Buyers get price sensitive when the item is a **big share of their costs**. Less so when quality really matters to them.",
+  "Leverage: **a few large buyers** taking most sales, low switching costs, standard products, a threat to **integrate backward**.",
+  "Uhm, suppliers are strong when **concentrated**, **differentiated**, able to **integrate forward**, and **not dependent on the industry**.",
+  "Essentially, an artist forcing a streaming service to pay royalties? **Supplier power.**",
+  "What I mean to say is, **bundling** raises switching costs. Number portability **lowers** them."]},
+ {t:"Complements", ask:"What about products that go together, like printers and ink?", l:[
+  "Uhm, **complements** raise demand for each other, and they **raise switching costs**.",
+  "Porter says complements and government are **not a sixth force**. Trace their effect **through all five**.",
+  "Essentially, a heavy tax can cut demand **and** scare off entrants at once.",
+  "What I mean to say is, value goes to whoever is harder to replace."]},
+ {t:"Using the analysis", ask:"I've cased it. What do I do with the analysis?", l:[
+  "Uhm, three uses. **Forecast** profits. **Change** the structure. **Position** where forces are weakest.",
+  "Like a truck maker serving owner-drivers who care about comfort, not price.",
+  "Essentially, Porter's traps: thinking **fast growth** means attractive. Making lists. **Declaring an industry good or bad.**",
+  "The model still works when one force pushes profit up and another pushes it down.",
+  "Limits: it's a **static snapshot**, assumes **stable boundaries** and **similar products**.",
+  "What I mean to say is, it **can** explain strong suppliers. That's one of the forces.",
+  "Uhm, and when industries **converge**, like phones replacing music players, boundaries blur."]},
+ {t:"Walls and winners", ask:"How do I decide where an industry's walls are? And what wins inside?", l:[
+  "Uhm, draw the walls by **substitutability**, on the **supply side** too.",
+  "Fridges and dishwashers aren't substitutes for buyers. But makers share plants, suppliers and customers. **Same five forces, same industry.**",
+  "Essentially, the model isn't fussy about walls. Inside is **rivalry**, outside is **substitutes**.",
+  "What I mean to say is, **key success factors** come from two questions: **What do customers want?** **How do firms survive the competition?**"]}
+],
+i:[
+ {t:"Industry isn't everything", ask:"Why do firms in the same industry differ so much?", l:[
+  "Uhm, industry explains **less than 20%** of profit differences between firms.",
+  "Essentially, a **smaller** share than firm-level factors.",
+  "What I mean to say is, industry and firm analysis are both useful, and together they still don't explain everything.",
+  "Uhm, **hypercompetition**: fast moves erode advantages. **Winner-take-all**: network effects make share decisive."]},
+ {t:"Ecosystems", ask:"Who else is in the picture besides rivals, buyers and suppliers?", l:[
+  "Uhm, your **business ecosystem**: partners, complementors, platforms. Everyone who affects you.",
+  "Essentially, you capture more value by **controlling a bottleneck** and becoming **irreplaceable**.",
+  "What I mean to say is, a **business model** is the logic of how you create value and turn it into profit."]},
+ {t:"Your share of the pie", ask:"How much of the pie can I actually capture?", l:[
+  "**Upper limit**: the value you **add to your current network**. How much vanishes if you leave?",
+  "Essentially, **lower limit**: the value you could add to another network."]},
+ {t:"The prisoners' dilemma", ask:"Why do rivals end up hurting each other on purpose?", l:[
+  "Uhm, picture two rivals choosing a big or small ad budget.",
+  "Both would earn more if both went small. But each fears the other going big.",
+  "Essentially, **both go big**. That's the **Nash equilibrium**: nobody gains by changing alone.",
+  "What I mean to say is, escapes are making the game **repeated**, or changing the payoffs."]},
+ {t:"Changing the game", ask:"How do I change how the guards play?", l:[
+  "**Cooperation**. Uhm, **co-opetition** means competing and cooperating at the same time.",
+  "**Deterrence**. Threats must be **credible**.",
+  "A price-war threat hurts the incumbent more than the entrant, so it's weak. Building **excess capacity** is more believable.",
+  "**Commitment**: remove your own options. Essentially, a general burning his ships so retreat is impossible.",
+  "**Hard** commitments signal aggression. **Soft** ones signal you'll go easy.",
+  "**Signaling**: reputation, preannounced price moves.",
+  "What I mean to say is, game theory explains the past better than it predicts. Models give **no equilibrium or many**, and hinge on assumptions."]},
+ {t:"Reading a rival", ask:"How do I predict what a rival will do next?", l:[
+  "Uhm, four things. Their **current strategy**. Their **objectives**.",
+  "Their **assumptions about the industry**. Their **resources and capabilities**.",
+  "Essentially, shared industry beliefs create **blindspots**. Old bike makers laughed at small foreign bikes, then lost the market."]},
+ {t:"Segmentation", ask:"How do I split a market into pieces worth attacking?", l:[
+  "Uhm, pick variables, build a matrix, rate each segment with the five forces, find its key success factors.",
+  "Essentially, the point: **find attractive segments, pick a strategy for each, decide how many to serve**.",
+  "What I mean to say is, **mobility barriers** protect one segment from firms in other segments."]},
+ {t:"Strategic groups", ask:"Aren't firms with similar strategies basically one gang?", l:[
+  "Uhm, a **strategic group** is firms following similar strategies. Full-service airlines versus low-cost ones.",
+  "Essentially, the evidence of lasting profit gaps between groups is weak.",
+  "What I mean to say is, groups help you understand **positioning and patterns of competition**. Not collusion."]}
+],
+q:[
+ {t:"What a resource is", ask:"What counts as a resource?", l:[
+  "Uhm, three kinds. **Physical** assets. **Intangibles** like brands and patents. **Capabilities**: things you're good at.",
+  "Essentially, **resource = what you own. Capability = what you can do.**",
+  "Real estate is a resource. Picking great sites is a capability.",
+  "Uhm, your rivals are **not** your resource. They're your environment.",
+  "What I mean to say is, a resource's value comes from **demand, scarcity and appropriability** together."]},
+ {t:"Can it be copied?", ask:"How do I know if a resource can be copied?", l:[
+  "Four shields. **Physical uniqueness**: a prime spot, a patent.",
+  "**Path dependency**: built over years, can't be rushed. Decades of brand trust. Years of user data.",
+  "**Causal ambiguity**: rivals can't tell what makes it work. Like a company culture.",
+  "**Economic deterrence**: a big, market-specific investment nobody will match. The first plant in a small market.",
+  "Uhm, VRIO: **valuable, rare, costly to imitate**, and organized to capture it.",
+  "Essentially, valuable and rare but **easy to copy**? Only a **temporary** advantage."]},
+ {t:"Does it last?", ask:"Does a great resource last forever?", l:[
+  "Uhm, a strong brand can last decades. Tech know-how can go stale in a year.",
+  "Essentially, a resource that **depreciates quickly** is worth less."]},
+ {t:"Who keeps the loot", ask:"If I own the resource, don't I keep all the profit?", l:[
+  "Uhm, not always. Staff, suppliers and customers all bargain for a share.",
+  "Essentially, if the resource lives in **people who can walk out**, the profit walks with them.",
+  "What I mean to say is, a deal network held by a firm's partners fails this test. That's **appropriability**."]},
+ {t:"Beaten by something else", ask:"What if a rival beats my resource with a different one?", l:[
+  "Uhm, then you fail **substitutability**.",
+  "A no-frills airline's system was hard to copy. Big airlines matched its fares with reservation systems and yield management instead.",
+  "Essentially, steel lost beer cans to aluminium the same way."]},
+ {t:"Really better?", ask:"Everyone says they're good at marketing. How do I know I really am?", l:[
+  "Uhm, judge against **rivals**, not against your own other activities.",
+  "Essentially, call it **distinctive competence**: something you do **better than competitors**.",
+  "What I mean to say is, break it down. 'Marketing' is too broad. Which part do you do better?"]},
+ {t:"Using your gear", ask:"So what do I do with my resources?", l:[
+  "**Invest**: everything depreciates. Uhm, but analyse the industry first.",
+  "Essentially, a classic mistake is investing in core competences **without an industry analysis**.",
+  "**Upgrade**: add a new resource, like a chip maker adding a consumer brand. Or move to better industries.",
+  "**Leverage** into new markets. What I mean to say is, **cash** travels easily but rarely gives an edge."]},
+ {t:"Exam traps", ask:"Any terms the examiners like to trip people on?", l:[
+  "Uhm, resource or capability? A streaming library is a **resource**. Making content is a **capability**.",
+  "An airline's premium routes: **resource**. Great service: **capability**.",
+  "Essentially, a pharma patent is an **inimitable** resource.",
+  "What I mean to say is, five forces works at **industry** level. Resources work at **firm** level."]}
+],
+t:[
+ {t:"Markets age", ask:"Do industries age like people?", l:[
+  "Uhm, yes. **Introduction, growth, maturity, decline.**",
+  "Essentially, life cycles are getting **shorter** as technology speeds up.",
+  "What I mean to say is, some industries **rejuvenate**. TVs went colour, then flat, then HD."]},
+ {t:"Dominant designs", ask:"How does an industry settle on one way of doing things?", l:[
+  "Uhm, early on, rival designs compete. Then a **dominant design** wins and everyone copies it.",
+  "Essentially, focus then shifts from **product innovation to process innovation**.",
+  "A **technical standard** is different: it ensures **compatibility**, and someone usually **owns** it."]},
+ {t:"Stage by stage", ask:"What changes from stage to stage?", l:[
+  "**Introduction**: early adopters, rival designs. **Growth**: demand races ahead, capacity is short.",
+  "**Maturity**: price-sensitive buyers, commodity products. Essentially, **cost efficiency** wins.",
+  "**Decline**: overcapacity and **price wars**. Keep overheads low, cut capacity.",
+  "Uhm, early movers can lock up an **exclusive network of suppliers and complementors**."]},
+ {t:"Who survives", ask:"Who survives as the industry matures?", l:[
+  "Uhm, a **shakeout** hits at the **onset of maturity**. Many firms exit.",
+  "**Resource partitioning**: giants consolidate, so specialists find niches. Like craft brewers.",
+  "Essentially, firms from related industries do well if their capabilities carry over."]},
+ {t:"Why giants freeze", ask:"Why can't big firms just change when they need to?", l:[
+  "Uhm, **routines** harden into rigidities. **Politics**: change threatens power.",
+  "**Isomorphism**: firms copy peers to look legitimate, so everyone gets stuck together.",
+  "**Limited search**: stop looking once things are good enough.",
+  "Essentially, strategy, structure and systems lock together. Piecemeal change fails.",
+  "What I mean to say is, **punctuated equilibrium**: long calm, then sudden radical change."]},
+ {t:"Tech that topples leaders", ask:"Which kinds of new technology topple leaders?", l:[
+  "**Competence-destroying**: makes old skills useless. Quartz watches versus Swiss watchmakers.",
+  "**Architectural**: changes how components link together, the whole system. Uhm, brutal for incumbents.",
+  "Essentially, **disruptive**: worse at first on what mainstream customers want, grows in niches, then takes over."]},
+ {t:"Forcing change", ask:"How do leaders force change anyway?", l:[
+  "**Ambidexterity**: explore and exploit. **Structural**: a separate unit for the new stuff. **Contextual**: same people do both.",
+  "Uhm, create a sense of crisis. Stretch targets. Reorganize.",
+  "Essentially, an **outside CEO** helps most when the firm is **performing poorly**.",
+  "**Scenario analysis** isn't a forecast. What I mean to say is, its value is **surfacing assumptions and testing strategies**."]},
+ {t:"Building capabilities", ask:"How does a firm build capabilities it doesn't have?", l:[
+  "Uhm, capabilities are **path dependent**. Build them step by step.",
+  "**Dynamic capabilities** are higher-order: **sense, seize, reconfigure**.",
+  "Essentially, **explicit** knowledge can be written down. **Tacit** know-how only shows when you do it, and passes on by practice."]}
+]
+};
 
 
 /* =================================================================
@@ -552,13 +853,16 @@ function setKey(k,down){ if(down && !K[k] && (k==="j"||k==="e")) KP[k]=true; K[k
 const KEYMAP = { ArrowLeft:"l", a:"l", A:"l", ArrowRight:"r", d:"r", D:"r", " ":"j", ArrowUp:"j", w:"j", W:"j", e:"e", E:"e", Enter:"e", ArrowDown:"e", s:"e", S:"e" };
 window.addEventListener("keydown", ev=>{
   if(!ovEl.hidden){ overlayKey(ev); return; }
+  if(DLG){ const m={"1":0,"2":1,"3":2}; if(ev.key in m){ dlgChoose(m[ev.key]); ev.preventDefault(); return; }
+    if(ev.key==="Escape" && !DLG.choices){ endDialog(); return; }
+    const k0 = KEYMAP[ev.key]; if((k0==="e"||k0==="j") && !ev.repeat){ if(ev.target && ev.target.closest && ev.target.closest("#dlg button") && (ev.key==="Enter"||ev.key===" ")) return; dlgAdvance(); ev.preventDefault(); } return; }
   const k = KEYMAP[ev.key]; if(k){ setKey(k,true); ev.preventDefault(); }
 });
 window.addEventListener("keyup", ev=>{ const k = KEYMAP[ev.key]; if(k) setKey(k,false); });
 window.addEventListener("blur", ()=>{ for(const k in K) K[k]=false; });
 document.querySelectorAll(".pad button").forEach(b=>{
   const k=b.dataset.k;
-  b.addEventListener("pointerdown", e=>{ e.preventDefault(); b.setPointerCapture && b.setPointerCapture(e.pointerId); setKey(k,true); });
+  b.addEventListener("pointerdown", e=>{ e.preventDefault(); if(DLG){ if(k==="e"||k==="j") dlgAdvance(); return; } b.setPointerCapture && b.setPointerCapture(e.pointerId); setKey(k,true); });
   ["pointerup","pointercancel","pointerleave"].forEach(t=>b.addEventListener(t, ()=>setKey(k,false)));
 });
 
@@ -841,7 +1145,7 @@ function titleScreen(){
   const hired = CREW.filter(c=>S.hired[c.id]).length;
   showOv(`<span class="label">Case file OM-11 · Competition &amp; Strategy</span>
     <div class="big">Hit <em>Suchir's Liquor Shop</em>.</div>
-    <p style="font-size:17px;color:var(--muted);max-width:60ch">Suchir's Liquor Shop has owned the best corner in town for years, and nobody has cracked it. You're the rookie planning the job. Six master thieves are in town, and each one knows a chapter cold. <b style="color:var(--ink)">Sit with them, ask your questions, and learn how they think.</b> Then pass their trial and they'll join your crew and hand you a piece of kit for the big night.</p>
+    <p style="font-size:17px;color:var(--muted);max-width:60ch">Suchir's Liquor Shop has owned the best corner in town for years, and nobody has cracked it. You're the rookie planning the job. Six master thieves are in town, and each one knows a chapter cold. <b style="color:var(--ink)">Walk up, ask them questions one at a time, and learn how they think.</b> Then pass their trial and they'll join your crew and hand you a piece of kit for the big night.</p>
     <ul class="list">
       <li><b>Walk</b> with arrows or A/D, <b>jump</b> with Space, <b>talk and use</b> with E.</li>
       <li>Every lock in a trial is an exam-style MCQ. Get 5 of 8 right and the thief joins you. Hazards only send you back to the last checkpoint.</li>
@@ -851,47 +1155,82 @@ function titleScreen(){
     <div class="btns"><button class="btn go" data-a="hub">${hired?'Back to the hideout':'Enter the hideout'}</button>${hired||S.best?'<button class="btn ghost" data-a="reset">Reset progress</button>':''}</div>`, {kind:"title"});
 }
 
-/* ---------- learning conversation: the thief teaches, you learn ---------- */
-const OPEN = ["Uhm, okay. Essentially,","Uhm... so, what I mean to say is,","Right. Uhm. Essentially,","Okay, uhm, listen. What I mean to say is,","Essentially, uhm, it's like this."];
-const CLOSE = ["Essentially, that's the whole trick. Uhm, yeah.","What I mean to say is, don't overthink it.","Uhm... essentially, remember that on the job.","Uhm, yeah. What I mean to say is, that's it, essentially.","Essentially. Uhm. Got it?"];
-const NODS = ["Uhm, okay. I think I get it.","Right. Keep going.","Essentially... got it. What's next?","Okay. That makes sense, I think.","Huh. Okay. Go on."];
+/* ---------- learning conversation: one text box at a time ---------- */
 const pick = (arr, k) => arr[k % arr.length];
+const dlgEl = document.getElementById("dlg");
+let DLG = null;
+function parseLine(raw){
+  const me = raw.startsWith(">"); const s = raw.replace(/^>\s*/,"");
+  const segs = []; s.split(/(\*\*[^*]+\*\*)/).forEach(p=>{ if(!p) return; if(p.startsWith("**")) segs.push({t:p.slice(2,-2), b:true}); else segs.push({t:p, b:false}); });
+  return { me, segs, len: segs.reduce((a,x)=>a+x.t.length,0) };
+}
+function partial(segs, n){ let out="", left=n; for(const g of segs){ if(left<=0) break; const t=g.t.slice(0,left); left-=t.length; out += g.b ? "<b>"+esc(t)+"</b>" : esc(t); } return out; }
+function startDialog(id, lines, choices, tag){
+  DLG = { id, lines: lines.map(parseLine), i:0, shown:0, choices, tag:tag||"", lastDrawn:-1 };
+  paused = true; for(const k in K) K[k]=false;
+  dlgEl.hidden = false; dlgDraw(true);
+}
+function endDialog(){ DLG = null; dlgEl.hidden = true; dlgEl.innerHTML = ""; paused = false; }
+function dlgDraw(full){
+  if(!DLG) return;
+  const c = byId(DLG.id), ex = EXTRA[DLG.id], L0 = DLG.lines[DLG.i];
+  const done = DLG.shown >= L0.len, last = DLG.i === DLG.lines.length-1;
+  if(full || !dlgEl.firstChild){
+    dlgEl.innerHTML = `<span class="dava" id="dAva"></span>
+      <div class="dmain"><div class="dhead"><span class="dnm" id="dNm"></span><span class="dtag">${esc(DLG.tag)}</span></div>
+      <p class="dtx" id="dTx"></p><div class="dft" id="dFt"></div></div>`;
+  }
+  const ava = document.getElementById("dAva"), nm = document.getElementById("dNm");
+  ava.textContent = L0.me ? "YOU" : c.ini; ava.style.background = L0.me ? "#EDF1F7" : ex.col;
+  nm.textContent = L0.me ? "You" : c.crew.replace("The ","");
+  dlgEl.classList.toggle("me", L0.me);
+  document.getElementById("dTx").innerHTML = partial(L0.segs, Math.floor(DLG.shown)) + (done ? "" : '<span class="caret"></span>');
+  const ft = document.getElementById("dFt");
+  if(done && last && DLG.choices){
+    if(!ft.dataset.ch){ ft.dataset.ch = "1"; ft.innerHTML = `<div class="dch">${DLG.choices.map((c2,i)=>`<button class="btn ${i===0?'go':''}" data-ch="${i}"><span class="kk">${i+1}</span>${esc(c2.label)}</button>`).join("")}</div>`;
+      const f = ft.querySelector("button"); if(f) f.focus({preventScroll:true}); if(DLG.onChoices) DLG.onChoices(); }
+  } else {
+    ft.dataset.ch = ""; ft.innerHTML = `<span class="dprog">${DLG.i+1} / ${DLG.lines.length}</span><span class="dnext">${done ? (last ? "E  close" : "E  next ▾") : "E  skip"}</span>`;
+  }
+  DLG.lastDrawn = Math.floor(DLG.shown);
+}
+function dlgAdvance(){
+  if(!DLG) return;
+  const L0 = DLG.lines[DLG.i];
+  if(DLG.shown < L0.len){ DLG.shown = L0.len; return dlgDraw(); }
+  if(DLG.i < DLG.lines.length-1){ DLG.i++; DLG.shown = 0; return dlgDraw(); }
+  if(!DLG.choices) endDialog();
+}
+function dlgChoose(i){ if(!DLG || !DLG.choices) return; const L0=DLG.lines[DLG.i]; if(DLG.i<DLG.lines.length-1 || DLG.shown<L0.len) return; const ch = DLG.choices[i]; if(ch){ const fn=ch.fn; endDialog(); fn(); } }
+function dlgTick(dt){ if(!DLG) return; const L0 = DLG.lines[DLG.i]; if(DLG.shown < L0.len){ DLG.shown = Math.min(L0.len, DLG.shown + dt*(reduce?9999:62)); if(Math.floor(DLG.shown)!==DLG.lastDrawn) dlgDraw(); } }
+dlgEl.addEventListener("click", ev=>{ const b = ev.target.closest("[data-ch]"); if(b){ dlgChoose(Number(b.dataset.ch)); return; } dlgAdvance(); });
+
+function talk(id, k){
+  hideOv();
+  const c = byId(id), ex = EXTRA[id], sc = SCRIPT[id], n = sc.length;
+  S.les = S.les || {};
+  const trial = { label: "Take the " + ex.lvl.toLowerCase(), fn: ()=>startInterview(id) };
+  const later = { label: "Later", fn: ()=>{} };
+  if(k===undefined && S.hired[id]){
+    return startDialog(id, [`Uhm, rookie. Essentially, I'm on the crew. What I mean to say is, the **${ex.prize.toLowerCase()}** is yours for the heist.`],
+      [ { label:"Hear the lessons again", fn:()=>talk(id,0) }, { label:"Retake the "+ex.lvl.toLowerCase(), fn:()=>startInterview(id) }, later ], "On the crew");
+  }
+  if(k===undefined) k = Math.min(S.les[id]||0, n);
+  if(k >= n){
+    return startDialog(id, ["Uhm, essentially, I've taught you everything I know.", `What I mean to say is, run my **${ex.lvl.toLowerCase()}**. Get **5 of 8** right and I'm in.`],
+      [ trial, { label:"Hear the lessons again", fn:()=>talk(id,0) }, later ], "Ready");
+  }
+  const L0 = sc[k];
+  const lines = (k===0 ? INTRO[id] : []).concat([">"+L0.ask], L0.l);
+  const lastLesson = k === n-1;
+  if(lastLesson) lines.push(`Uhm, okay. Essentially, now I test you. Every **${ex.term.toLowerCase()}** you reach in my ${ex.lvl.toLowerCase()}, I quiz you.`);
+  const choices = lastLesson ? [ trial, later ]
+    : [ { label:`Ask the next question (${k+2} of ${n})`, fn:()=>talk(id,k+1) }, { label:"Skip to the trial", fn:()=>startInterview(id) }, later ];
+  startDialog(id, lines, choices, `Lesson ${k+1} of ${n} · ${L0.t}`);
+  DLG.onChoices = ()=>{ S.les[id] = Math.max(S.les[id]||0, k+1); save(); };
+}
 function chatLine(side, ava, col, name, html, extra){
   return `<div class="line ${side}"><span class="ava sm" style="background:${col}">${ava}</span><div class="bw"><span class="nm">${name}</span><div class="bub ${extra||''}">${html}</div></div></div>`;
-}
-function talk(id, k){
-  const c = byId(id), ex = EXTRA[id], thief = c.crew.replace("The ","");
-  const me = (html)=>chatLine("me","YOU","#EDF1F7","You",html);
-  const them = (html,extra)=>chatLine("them",c.ini,ex.col,thief,html,extra);
-  if(k===undefined && S.hired[id]){
-    showOv(`${whoHtml(c)}
-      <div class="chat">
-        ${me("You're on the crew, right?")}
-        ${them(`Uhm, yeah. Essentially, I'm in. What I mean to say is, the ${esc(ex.prize.toLowerCase())} is yours now. Uhm, use it well.`)}
-      </div>
-      <div class="prize"><span class="ic">${ex.pic}</span><div><b>${ex.prize}</b><p>${ex.perk}</p></div></div>
-      <p class="label">Best trial: ${starsHtml(S.stars[id]||0)}</p>
-      <div class="btns"><button class="btn" data-a="teach" data-id="${id}">Hear the lessons again</button><button class="btn" data-a="interview" data-id="${id}">Retake the ${esc(ex.lvl.toLowerCase())}</button><button class="btn go" data-a="close">Back to planning</button></div>`, {kind:"talk"});
-    return;
-  }
-  k = k||0; const card = c.brief[k];
-  const last = k===c.brief.length-1;
-  const intro = k===0 ? them(`Uhm, so you're the rookie. Essentially, I don't join anyone I haven't taught myself. What I mean to say is, sit down. Ask.`, "soft") : "";
-  showOv(`${whoHtml(c)}
-    <div class="meta"><span class="label">Lesson ${k+1} of ${c.brief.length} · ${esc(card[0])}</span><span class="dots">${c.brief.map((_,i)=>`<i class="${i<=k?'on':''}"></i>`).join("")}</span></div>
-    <div class="chat">
-      ${intro}
-      ${me(esc(ex.ask[k]))}
-      ${them(`<p class="tic">${pick(OPEN,k+id.charCodeAt(0))}</p>${card[1]}<p class="tic">${pick(CLOSE,k*3+id.charCodeAt(0))}</p>`)}
-      ${card[2]?them(`What I mean to say is, uhm... ${card[2]}`,"tip"):''}
-      ${last?them(`Uhm, okay. Essentially, now I test you. Run my ${esc(ex.lvl.toLowerCase())}. Every ${esc(ex.term.toLowerCase())} you reach, I quiz you. Get five of eight and, uhm, what I mean to say is, I'm in.`,"soft"):me(pick(NODS,k))}
-    </div>
-    <div class="btns">
-      ${k>0?`<button class="btn" data-a="teach" data-id="${id}" data-k="${k-1}">Back</button>`:''}
-      ${last?`<button class="btn go" data-a="interview" data-id="${id}">Take the ${esc(ex.lvl.toLowerCase())}</button>`:`<button class="btn go" data-a="teach" data-id="${id}" data-k="${k+1}">Ask the next question</button>`}
-      ${!last?`<button class="btn ghost" data-a="interview" data-id="${id}">Skip to the trial</button>`:''}
-      <button class="btn ghost" data-a="close">Later</button>
-    </div>`, {kind:"talk"});
 }
 function whoHtml(c){ const ex=EXTRA[c.id]; return `<div class="who"><span class="ava" style="background:${ex.col}">${c.ini}</span><div><div class="n">${c.crew}</div><div class="s">Master thief · teaches ${esc(c.src)}</div></div></div>`; }
 
@@ -1012,7 +1351,7 @@ ovc.addEventListener("click", ev=>{
   if(a==="qdone" && OV && OV.kind==="q") return closeQ(OV);
   if(a==="tip" && OV && OV.kind==="q" && G.tips>0){ const Q=OV.term.q; G.tips--; Q.gone = shuffle(Q.opts.map((o,i)=>o.c?-1:i).filter(i=>i>=0)).slice(0,2); return renderQ(OV); }
   if(a==="reset"){ if(!resetArmed){ resetArmed=true; b.textContent="Tap again to erase everything"; setTimeout(()=>{ resetArmed=false; if(b.isConnected) b.textContent="Reset progress"; },3000); return; }
-    S={stars:{},hired:{},best:null}; save(); resetArmed=false; return titleScreen(); }
+    S={stars:{},hired:{},best:null,les:{}}; save(); resetArmed=false; return titleScreen(); }
 });
 
 /* =================================================================
@@ -1172,6 +1511,7 @@ function frame(now){
     stepEnts(dt); stepPlayer(dt); stepInteract();
     const target = P.x - VW*0.4; camX += (Math.max(0, Math.min(L.w*T-VW, target)) - camX) * Math.min(1, dt*8);
   }
+  dlgTick(dt);
   KP.j=false; KP.e=false;
   if(flash>0) flash=Math.max(0,flash-dt);
   if(toast){ toast.life-=dt; if(toast.life<=0) toast=null; }
